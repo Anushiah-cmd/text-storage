@@ -1,1 +1,499 @@
 Hello world this is my text
+
+Exp 1
+import numpy as np
+
+print("===== NUMPY ARRAY OPERATIONS (OPTIMIZED) =====")
+
+# 1. Array Creation
+print("\n[1] Array Creation")
+a = np.array([1, 2, 3, 4, 5])
+b = np.array([[10, 20, 30], [40, 50, 60]])
+print("1D Array:", a)
+print("2D Array:\n", b)
+
+# 2. Array Properties
+print("\n[2] Array Properties")
+print("Shape:", b.shape, " Dimension:", b.ndim, " Size:", b.size)
+
+# 3. Arithmetic Operations
+print("\n[3] Arithmetic Operations")
+x = np.array([10, 20, 30])
+y = np.array([1, 2, 3])
+print("Add:", x + y, " Sub:", x - y, " Mul:", x * y, " Div:", x / y)
+
+# 4. Indexing & Slicing
+print("\n[4] Indexing & Slicing")
+print("First Element:", a[0], " Slice:", a[1:4], " 2D Element:", b[1, 2])
+
+# 5. Statistical Operations
+print("\n[5] Statistical Operations")
+data = np.array([5, 10, 15, 20, 25])
+print("Mean:", np.mean(data), " Median:", np.median(data))
+print("Std:", np.std(data), " Sum:", np.sum(data))
+
+# 6. Mathematical Functions
+print("\n[6] Mathematical Functions")
+print("Square Root:", np.sqrt(data))
+print("Log:", np.log(data))
+
+# 7. Sorting & Filtering
+print("\n[7] Sorting & Filtering")
+unsorted = np.array([9, 2, 7, 1, 5])
+print("Sorted:", np.sort(unsorted))
+print("Filtered (>10):", data[data > 10])
+
+# 8. Stacking & Splitting
+print("\n[8] Stacking & Splitting")
+p = np.array([1, 2, 3])
+q = np.array([4, 5, 6])
+print("V-Stack:\n", np.vstack((p, q)))
+print("H-Stack:", np.hstack((p, q)))
+print("Split:", np.split(np.array([1,2,3,4,5,6]), 3))
+
+# 9. Copy Operation
+print("\n[9] Copy Operation")
+original = np.array([1, 2, 3])
+copy_arr = original.copy()
+original[0] = 99
+print("Original:", original)
+print("Copy:", copy_arr)
+
+print("\n===== END OF EXPERIMENT =====")
+
+EXP 2
+import pandas as pd
+
+# 1. Create DataFrame
+data = {
+    "ID": [1, 2, 3, 4, 5],
+    "Name": ["Anu", "Ravi", "Kiran", "Meena", "Arun"],
+    "Calories": [420, 380, None, 390, 410],
+    "Duration": [50, 40, 45, None, 55]
+}
+
+df = pd.DataFrame(data)
+
+print("1. Original DataFrame")
+print(df)
+
+# 2. Display shape
+print("\n2. Shape of DataFrame:")
+print(df.shape)
+
+# 3. Locate row
+print("\n3. Locate one row (index 0):")
+print(df.loc[0])
+
+# 4. Select columns
+print("\n4. Select Name and Calories:")
+print(df[["Name", "Calories"]])
+
+# 5. Check info
+print("\n5. DataFrame Info:")
+print(df.info())
+
+# 6. Drop missing values
+print("\n6. After dropping missing values:")
+print(df.dropna())
+
+# 7. Fill missing values with mean (FIXED - no warning)
+df["Calories"] = df["Calories"].fillna(df["Calories"].mean())
+df["Duration"] = df["Duration"].fillna(df["Duration"].mean())
+
+print("\n7. After filling missing values with mean:")
+print(df)
+
+# 8. Sort values
+print("\n8. Sorted by Calories (Descending):")
+print(df.sort_values(by="Calories", ascending=False))
+
+# 9. Filter data
+print("\n9. Filter Calories > 400:")
+print(df[df["Calories"] > 400])
+
+# 10. Add new column
+df["Result"] = ["Good", "Average", "Good", "Average", "Excellent"]
+
+print("\n10. After adding new column:")
+print(df)
+
+
+
+EXP 3
+
+# ==============================
+# IMPORT REQUIRED LIBRARIES
+# ==============================
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import load_iris
+
+# ==============================
+# LOAD IRIS DATASET
+# ==============================
+iris = load_iris()
+
+df = pd.DataFrame(
+    data=iris.data,
+    columns=iris.feature_names
+)
+
+# Add target column (optimized mapping)
+df["species"] = pd.Categorical.from_codes(iris.target, iris.target_names)
+print("\n===== FIRST 5 ROWS =====")
+print(df.head())
+
+# ==============================
+# SAVE & READ TEXT FILE (CSV)
+# ==============================
+df.to_csv("iris.txt", index=False)
+df_txt = pd.read_csv("iris.txt")
+print("\n===== DATA FROM TEXT FILE =====")
+print(df_txt.head())
+
+# ==============================
+# SAVE & READ EXCEL FILE
+# ==============================
+df.to_excel("iris.xlsx", index=False)
+df_excel = pd.read_excel("iris.xlsx")
+print("\n===== DATA FROM EXCEL FILE =====")
+print(df_excel.head())
+
+# ==============================
+# DESCRIPTIVE STATISTICS
+# ==============================
+print("\n===== DESCRIPTIVE STATISTICS =====")
+print(df.describe())
+print("\n===== CLASS DISTRIBUTION =====")
+print(df["species"].value_counts())
+
+# ==============================
+# VISUALIZATION
+# ==============================
+
+# Histogram
+df.hist(figsize=(8, 6))
+plt.suptitle("Histogram of Iris Features")
+plt.show()
+
+# Correlation Heatmap (optimized numeric selection)
+plt.figure(figsize=(6, 4))
+sns.heatmap(df.select_dtypes(include="number").corr(),
+            annot=True,
+            cmap="coolwarm")
+plt.title("Correlation Heatmap")
+plt.show()
+
+# Pairplot
+sns.pairplot(df, hue="species")
+plt.show()
+
+
+4 EXPERIMENT: Diabetes Dataset Analysis 
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression, LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix
+# ---------------------------------------------------
+# 1. LOAD DATASET
+# ---------------------------------------------------
+url = "https://raw.githubusercontent.com/plotly/datasets/master/diabetes.csv"
+data = pd.read_csv(url)
+print("\n=== DATASET ===")
+print("Shape:", data.shape)
+
+# ---------------------------------------------------
+# 2. UNIVARIATE ANALYSIS (SHORT)
+# ---------------------------------------------------
+
+print("\n=== UNIVARIATE ===")
+print("Mean:\n", data.mean().round(2))
+print("Median:\n", data.median())
+print("\nFrequency (Outcome):")
+print(data["Outcome"].value_counts())
+
+# ---------------------------------------------------
+# 3. BIVARIATE ANALYSIS
+# ---------------------------------------------------
+
+X = data.drop("Outcome", axis=1)
+y = data["Outcome"]
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# ---------------------------------------------------
+# 4. LINEAR REGRESSION
+# ---------------------------------------------------
+
+print("\n=== LINEAR REGRESSION ===")
+lin_model = LinearRegression()
+lin_model.fit(X_train, y_train)
+lin_pred = lin_model.predict(X_test)
+print("Sample Predictions:", lin_pred[:5])
+
+# ---------------------------------------------------
+# 5. LOGISTIC REGRESSION
+# ---------------------------------------------------
+
+print("\n=== LOGISTIC REGRESSION ===")
+
+log_model = LogisticRegression(max_iter=500)
+log_model.fit(X_train, y_train)
+log_pred = log_model.predict(X_test)
+print("Accuracy:", round(accuracy_score(y_test, log_pred), 2))
+
+# ---------------------------------------------------
+# 🎯 ONLY 4 IMPORTANT GRAPHS
+# ---------------------------------------------------
+
+# 1. Histogram (Univariate)
+data["Glucose"].hist()
+plt.title("Glucose Distribution")
+plt.show()
+
+# 2. Bar Chart (Frequency)
+data["Outcome"].value_counts().plot(kind='bar')
+plt.title("Outcome Frequency")
+plt.xlabel("0 = No, 1 = Yes")
+plt.show()
+
+# 3. Scatter Plot (Bivariate)
+sns.scatterplot(x=data["Glucose"], y=data["BMI"], hue=data["Outcome"])
+plt.title("Glucose vs BMI")
+plt.show()
+
+# 4. Confusion Matrix (Model Result)
+sns.heatmap(confusion_matrix(y_test, log_pred), annot=True, fmt="d")
+plt.title("Confusion Matrix")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.show()
+
+Exp 5 
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+# -------- Load UCI Dataset (from file) --------
+uci = pd.read_csv("uci_diabetes.csv")
+# Ensure numeric
+uci = uci.apply(pd.to_numeric, errors='coerce')
+X_uci = uci.drop('target', axis=1)
+y_uci = uci['target']
+print("UCI Dataset shape:", X_uci.shape)
+
+# -------- Load Pima Dataset (from file) --------
+cols = ['Pregnancies','Glucose','BP','Skin','Insulin','BMI','DPF','Age','Outcome']
+
+pima = pd.read_csv("pima.csv", names=cols)
+
+# Convert to numeric (fix error)
+pima = pima.apply(pd.to_numeric, errors='coerce')
+
+# Clean data (replace invalid zeros)
+cols_to_fix = ['Glucose','BP','Skin','Insulin','BMI']
+pima[cols_to_fix] = pima[cols_to_fix].replace(0, np.nan)
+
+# Fill missing values
+pima.fillna(pima.median(numeric_only=True), inplace=True)
+X_pima = pima.drop('Outcome', axis=1)
+y_pima = pima['Outcome']
+print("Pima Dataset shape:", X_pima.shape)
+
+# -------- Model Function --------
+def run_model(X, y, name):
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
+    print(f"\n{name} Test samples:", len(y_test))
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    mse = mean_squared_error(y_test, y_pred)
+
+    # Safe R2 calculation
+    if len(y_test) < 2:
+        r2 = "Undefined (too few samples)"
+    else:
+        r2 = r2_score(y_test, y_pred)
+    print(name)
+    print("MSE:", mse)
+    print("R2 :", r2)
+    return model, X_test, y_test
+
+# -------- Run Models --------
+m1, Xt1, yt1 = run_model(X_uci, y_uci, "UCI Dataset")
+m2, Xt2, yt2 = run_model(X_pima, y_pima, "Pima Dataset")
+
+# -------- Plot Function --------
+def plot_result(model, X_test, y_test, title):
+    y_pred = model.predict(X_test)
+
+    plt.figure()
+    plt.scatter(y_test, y_pred)
+    # Ideal line
+    plt.plot([min(y_test), max(y_test)],
+             [min(y_test), max(y_test)])
+
+    plt.xlabel("Actual Values")
+    plt.ylabel("Predicted Values")
+    plt.title(title)
+    plt.show()
+
+# -------- Show Plots --------
+plot_result(m1, Xt1, yt1, "UCI Dataset Results")
+plot_result(m2, Xt2, yt2, "Pima Dataset Results")
+
+EXP 6
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import load_iris
+
+# LOAD DATASET
+iris = load_iris()
+df = pd.DataFrame(iris.data, columns=iris.feature_names)
+df["species"] = pd.Categorical.from_codes(iris.target, iris.target_names)
+
+print(df.head())
+
+# NORMAL CURVE
+f = df["sepal length (cm)"]
+m, s = f.mean(), f.std()
+x = np.linspace(m - 4*s, m + 4*s, 100)
+y = (1/(s*np.sqrt(2*np.pi))) * np.exp(-0.5*((x-m)/s)**2)
+
+plt.plot(x, y)
+plt.title("Normal Curve")
+plt.show()
+
+# DENSITY PLOT
+sns.kdeplot(df["petal length (cm)"], fill=True)
+plt.title("Density Plot")
+plt.show()
+
+# CONTOUR PLOT
+sns.kdeplot(x=df["sepal length (cm)"], y=df["sepal width (cm)"], fill=True)
+plt.title("Contour Plot")
+plt.show()
+
+# CORRELATION HEATMAP
+sns.heatmap(df.select_dtypes("number").corr(), annot=True, cmap="coolwarm")
+plt.title("Correlation Heatmap")
+plt.show()
+
+# SCATTER PLOT
+sns.scatterplot(df, x="sepal length (cm)", y="petal length (cm)", hue="species")
+plt.title("Scatter Plot")
+plt.show()
+
+# 3D PLOT
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.scatter(df.iloc[:,0], df.iloc[:,1], df.iloc[:,2], c=iris.target)
+plt.title("3D Plot")
+plt.show()
+
+# GEOGRAPHIC SIMULATION
+np.random.seed(42)
+plt.scatter(np.random.uniform(68,97,50), np.random.uniform(8,37,50))
+plt.title("Geographic Plot")
+plt.show()
+
+
+EXP 7
+
+# ==========================================
+# DIABETES PREDICTION (FINAL CLEAN VERSION)
+# ==========================================
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+# ------------------------------------------
+# STEP 1: LOAD DATASET (NO TRY-EXCEPT)
+# ------------------------------------------
+df = pd.read_csv("diabetes.csv")
+print("✅ Dataset loaded successfully")
+print("\n📊 Dataset Preview:\n", df.head())
+
+# ------------------------------------------
+# STEP 2: SPLIT DATA
+# ------------------------------------------
+X = df.drop("Outcome", axis=1)
+y = df["Outcome"]
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# ------------------------------------------
+# STEP 3: TRAIN MODEL
+# ------------------------------------------
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)
+
+# ------------------------------------------
+# STEP 4: PREDICTION
+# ------------------------------------------
+y_pred = model.predict(X_test)
+
+
+# ------------------------------------------
+# STEP 5: EVALUATION
+# ------------------------------------------
+print("\n✅ Accuracy:", accuracy_score(y_test, y_pred))
+print("\n📌 Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+print("\n📌 Classification Report:\n",
+      classification_report(y_test, y_pred, zero_division=0))
+
+# ------------------------------------------
+# STEP 6: NEW PATIENT PREDICTION
+# ------------------------------------------
+sample = pd.DataFrame([[2,120,70,30,0,32.5,0.5,25]],
+columns=X.columns)
+result = model.predict(sample)
+print("\n🧪 New Patient Result:")
+print("👉 Diabetic" if result[0] == 1 else "👉 Non-Diabetic")
+
+
+# ------------------------------------------
+# STEP 7: VISUALIZATION (4 GRAPHS)
+# ------------------------------------------
+
+# 1. Count Plot
+sns.countplot(x='Outcome', data=df)
+plt.title("Diabetes Count (0 = No, 1 = Yes)")
+plt.show()
+
+# 2. Glucose vs Diabetes
+sns.boxplot(x='Outcome', y='Glucose', data=df)
+plt.title("Glucose vs Diabetes")
+plt.show()
+
+# 3. BMI vs Diabetes
+sns.boxplot(x='Outcome', y='BMI', data=df)
+plt.title("BMI vs Diabetes")
+plt.show()
+
+# 4. Correlation Heatmap
+plt.figure(figsize=(8, 6))
+sns.heatmap(df.corr(), annot=True)
+plt.title("Feature Correlation")
+plt.show()
+
+
