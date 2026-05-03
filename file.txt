@@ -1,499 +1,755 @@
-Hello world this is my text
-
-Exp 1
-import numpy as np
-
-print("===== NUMPY ARRAY OPERATIONS (OPTIMIZED) =====")
-
-# 1. Array Creation
-print("\n[1] Array Creation")
-a = np.array([1, 2, 3, 4, 5])
-b = np.array([[10, 20, 30], [40, 50, 60]])
-print("1D Array:", a)
-print("2D Array:\n", b)
-
-# 2. Array Properties
-print("\n[2] Array Properties")
-print("Shape:", b.shape, " Dimension:", b.ndim, " Size:", b.size)
-
-# 3. Arithmetic Operations
-print("\n[3] Arithmetic Operations")
-x = np.array([10, 20, 30])
-y = np.array([1, 2, 3])
-print("Add:", x + y, " Sub:", x - y, " Mul:", x * y, " Div:", x / y)
-
-# 4. Indexing & Slicing
-print("\n[4] Indexing & Slicing")
-print("First Element:", a[0], " Slice:", a[1:4], " 2D Element:", b[1, 2])
-
-# 5. Statistical Operations
-print("\n[5] Statistical Operations")
-data = np.array([5, 10, 15, 20, 25])
-print("Mean:", np.mean(data), " Median:", np.median(data))
-print("Std:", np.std(data), " Sum:", np.sum(data))
-
-# 6. Mathematical Functions
-print("\n[6] Mathematical Functions")
-print("Square Root:", np.sqrt(data))
-print("Log:", np.log(data))
-
-# 7. Sorting & Filtering
-print("\n[7] Sorting & Filtering")
-unsorted = np.array([9, 2, 7, 1, 5])
-print("Sorted:", np.sort(unsorted))
-print("Filtered (>10):", data[data > 10])
-
-# 8. Stacking & Splitting
-print("\n[8] Stacking & Splitting")
-p = np.array([1, 2, 3])
-q = np.array([4, 5, 6])
-print("V-Stack:\n", np.vstack((p, q)))
-print("H-Stack:", np.hstack((p, q)))
-print("Split:", np.split(np.array([1,2,3,4,5,6]), 3))
-
-# 9. Copy Operation
-print("\n[9] Copy Operation")
-original = np.array([1, 2, 3])
-copy_arr = original.copy()
-original[0] = 99
-print("Original:", original)
-print("Copy:", copy_arr)
-
-print("\n===== END OF EXPERIMENT =====")
-
-EXP 2
-import pandas as pd
-
-# 1. Create DataFrame
-data = {
-    "ID": [1, 2, 3, 4, 5],
-    "Name": ["Anu", "Ravi", "Kiran", "Meena", "Arun"],
-    "Calories": [420, 380, None, 390, 410],
-    "Duration": [50, 40, 45, None, 55]
+Exp 1 
+Design and implement a Maven-based build pipeline to develop a Java application 
+that computes the factorial of a given number and generates the executable JAR 
+file.
+ROJECT STRUCTURE
+factorial/
+ ├── pom.xml
+ └── src/
+     ├── main/java/factorial/App.java
+     └── test/java/factorial/AppTest.java
+🟢 JAVA PROGRAM
+📄 App.java
+package factorial;
+public class App {
+    public static long factorial(int n) {
+        long f = 1;
+        for(int i = 1; i <= n; i++) {
+            f *= i;
+        }
+        return f;
+    }
+    public static void main(String[] args) {
+        System.out.println("Factorial of 5 = " + factorial(5));
+    }
 }
-
-df = pd.DataFrame(data)
-
-print("1. Original DataFrame")
-print(df)
-
-# 2. Display shape
-print("\n2. Shape of DataFrame:")
-print(df.shape)
-
-# 3. Locate row
-print("\n3. Locate one row (index 0):")
-print(df.loc[0])
-
-# 4. Select columns
-print("\n4. Select Name and Calories:")
-print(df[["Name", "Calories"]])
-
-# 5. Check info
-print("\n5. DataFrame Info:")
-print(df.info())
-
-# 6. Drop missing values
-print("\n6. After dropping missing values:")
-print(df.dropna())
-
-# 7. Fill missing values with mean (FIXED - no warning)
-df["Calories"] = df["Calories"].fillna(df["Calories"].mean())
-df["Duration"] = df["Duration"].fillna(df["Duration"].mean())
-
-print("\n7. After filling missing values with mean:")
-print(df)
-
-# 8. Sort values
-print("\n8. Sorted by Calories (Descending):")
-print(df.sort_values(by="Calories", ascending=False))
-
-# 9. Filter data
-print("\n9. Filter Calories > 400:")
-print(df[df["Calories"] > 400])
-
-# 10. Add new column
-df["Result"] = ["Good", "Average", "Good", "Average", "Excellent"]
-
-print("\n10. After adding new column:")
-print(df)
-
-
-
-EXP 3
-
-# ==============================
-# IMPORT REQUIRED LIBRARIES
-# ==============================
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.datasets import load_iris
-
-# ==============================
-# LOAD IRIS DATASET
-# ==============================
-iris = load_iris()
-
-df = pd.DataFrame(
-    data=iris.data,
-    columns=iris.feature_names
-)
-
-# Add target column (optimized mapping)
-df["species"] = pd.Categorical.from_codes(iris.target, iris.target_names)
-print("\n===== FIRST 5 ROWS =====")
-print(df.head())
-
-# ==============================
-# SAVE & READ TEXT FILE (CSV)
-# ==============================
-df.to_csv("iris.txt", index=False)
-df_txt = pd.read_csv("iris.txt")
-print("\n===== DATA FROM TEXT FILE =====")
-print(df_txt.head())
-
-# ==============================
-# SAVE & READ EXCEL FILE
-# ==============================
-df.to_excel("iris.xlsx", index=False)
-df_excel = pd.read_excel("iris.xlsx")
-print("\n===== DATA FROM EXCEL FILE =====")
-print(df_excel.head())
-
-# ==============================
-# DESCRIPTIVE STATISTICS
-# ==============================
-print("\n===== DESCRIPTIVE STATISTICS =====")
-print(df.describe())
-print("\n===== CLASS DISTRIBUTION =====")
-print(df["species"].value_counts())
-
-# ==============================
-# VISUALIZATION
-# ==============================
-
-# Histogram
-df.hist(figsize=(8, 6))
-plt.suptitle("Histogram of Iris Features")
-plt.show()
-
-# Correlation Heatmap (optimized numeric selection)
-plt.figure(figsize=(6, 4))
-sns.heatmap(df.select_dtypes(include="number").corr(),
-            annot=True,
-            cmap="coolwarm")
-plt.title("Correlation Heatmap")
-plt.show()
-
-# Pairplot
-sns.pairplot(df, hue="species")
-plt.show()
-
-
-4 EXPERIMENT: Diabetes Dataset Analysis 
-
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.metrics import accuracy_score, confusion_matrix
-# ---------------------------------------------------
-# 1. LOAD DATASET
-# ---------------------------------------------------
-url = "https://raw.githubusercontent.com/plotly/datasets/master/diabetes.csv"
-data = pd.read_csv(url)
-print("\n=== DATASET ===")
-print("Shape:", data.shape)
-
-# ---------------------------------------------------
-# 2. UNIVARIATE ANALYSIS (SHORT)
-# ---------------------------------------------------
-
-print("\n=== UNIVARIATE ===")
-print("Mean:\n", data.mean().round(2))
-print("Median:\n", data.median())
-print("\nFrequency (Outcome):")
-print(data["Outcome"].value_counts())
-
-# ---------------------------------------------------
-# 3. BIVARIATE ANALYSIS
-# ---------------------------------------------------
-
-X = data.drop("Outcome", axis=1)
-y = data["Outcome"]
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
-# ---------------------------------------------------
-# 4. LINEAR REGRESSION
-# ---------------------------------------------------
-
-print("\n=== LINEAR REGRESSION ===")
-lin_model = LinearRegression()
-lin_model.fit(X_train, y_train)
-lin_pred = lin_model.predict(X_test)
-print("Sample Predictions:", lin_pred[:5])
-
-# ---------------------------------------------------
-# 5. LOGISTIC REGRESSION
-# ---------------------------------------------------
-
-print("\n=== LOGISTIC REGRESSION ===")
-
-log_model = LogisticRegression(max_iter=500)
-log_model.fit(X_train, y_train)
-log_pred = log_model.predict(X_test)
-print("Accuracy:", round(accuracy_score(y_test, log_pred), 2))
-
-# ---------------------------------------------------
-# 🎯 ONLY 4 IMPORTANT GRAPHS
-# ---------------------------------------------------
-
-# 1. Histogram (Univariate)
-data["Glucose"].hist()
-plt.title("Glucose Distribution")
-plt.show()
-
-# 2. Bar Chart (Frequency)
-data["Outcome"].value_counts().plot(kind='bar')
-plt.title("Outcome Frequency")
-plt.xlabel("0 = No, 1 = Yes")
-plt.show()
-
-# 3. Scatter Plot (Bivariate)
-sns.scatterplot(x=data["Glucose"], y=data["BMI"], hue=data["Outcome"])
-plt.title("Glucose vs BMI")
-plt.show()
-
-# 4. Confusion Matrix (Model Result)
-sns.heatmap(confusion_matrix(y_test, log_pred), annot=True, fmt="d")
-plt.title("Confusion Matrix")
-plt.xlabel("Predicted")
-plt.ylabel("Actual")
-plt.show()
-
-Exp 5 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, r2_score
-
-# -------- Load UCI Dataset (from file) --------
-uci = pd.read_csv("uci_diabetes.csv")
-# Ensure numeric
-uci = uci.apply(pd.to_numeric, errors='coerce')
-X_uci = uci.drop('target', axis=1)
-y_uci = uci['target']
-print("UCI Dataset shape:", X_uci.shape)
-
-# -------- Load Pima Dataset (from file) --------
-cols = ['Pregnancies','Glucose','BP','Skin','Insulin','BMI','DPF','Age','Outcome']
-
-pima = pd.read_csv("pima.csv", names=cols)
-
-# Convert to numeric (fix error)
-pima = pima.apply(pd.to_numeric, errors='coerce')
-
-# Clean data (replace invalid zeros)
-cols_to_fix = ['Glucose','BP','Skin','Insulin','BMI']
-pima[cols_to_fix] = pima[cols_to_fix].replace(0, np.nan)
-
-# Fill missing values
-pima.fillna(pima.median(numeric_only=True), inplace=True)
-X_pima = pima.drop('Outcome', axis=1)
-y_pima = pima['Outcome']
-print("Pima Dataset shape:", X_pima.shape)
-
-# -------- Model Function --------
-def run_model(X, y, name):
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
-    print(f"\n{name} Test samples:", len(y_test))
-    model = LinearRegression()
-    model.fit(X_train, y_train)
-    y_pred = model.predict(X_test)
-    mse = mean_squared_error(y_test, y_pred)
-
-    # Safe R2 calculation
-    if len(y_test) < 2:
-        r2 = "Undefined (too few samples)"
-    else:
-        r2 = r2_score(y_test, y_pred)
-    print(name)
-    print("MSE:", mse)
-    print("R2 :", r2)
-    return model, X_test, y_test
-
-# -------- Run Models --------
-m1, Xt1, yt1 = run_model(X_uci, y_uci, "UCI Dataset")
-m2, Xt2, yt2 = run_model(X_pima, y_pima, "Pima Dataset")
-
-# -------- Plot Function --------
-def plot_result(model, X_test, y_test, title):
-    y_pred = model.predict(X_test)
-
-    plt.figure()
-    plt.scatter(y_test, y_pred)
-    # Ideal line
-    plt.plot([min(y_test), max(y_test)],
-             [min(y_test), max(y_test)])
-
-    plt.xlabel("Actual Values")
-    plt.ylabel("Predicted Values")
-    plt.title(title)
-    plt.show()
-
-# -------- Show Plots --------
-plot_result(m1, Xt1, yt1, "UCI Dataset Results")
-plot_result(m2, Xt2, yt2, "Pima Dataset Results")
-
-EXP 6
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.datasets import load_iris
-
-# LOAD DATASET
-iris = load_iris()
-df = pd.DataFrame(iris.data, columns=iris.feature_names)
-df["species"] = pd.Categorical.from_codes(iris.target, iris.target_names)
-
-print(df.head())
-
-# NORMAL CURVE
-f = df["sepal length (cm)"]
-m, s = f.mean(), f.std()
-x = np.linspace(m - 4*s, m + 4*s, 100)
-y = (1/(s*np.sqrt(2*np.pi))) * np.exp(-0.5*((x-m)/s)**2)
-
-plt.plot(x, y)
-plt.title("Normal Curve")
-plt.show()
-
-# DENSITY PLOT
-sns.kdeplot(df["petal length (cm)"], fill=True)
-plt.title("Density Plot")
-plt.show()
-
-# CONTOUR PLOT
-sns.kdeplot(x=df["sepal length (cm)"], y=df["sepal width (cm)"], fill=True)
-plt.title("Contour Plot")
-plt.show()
-
-# CORRELATION HEATMAP
-sns.heatmap(df.select_dtypes("number").corr(), annot=True, cmap="coolwarm")
-plt.title("Correlation Heatmap")
-plt.show()
-
-# SCATTER PLOT
-sns.scatterplot(df, x="sepal length (cm)", y="petal length (cm)", hue="species")
-plt.title("Scatter Plot")
-plt.show()
-
-# 3D PLOT
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-ax.scatter(df.iloc[:,0], df.iloc[:,1], df.iloc[:,2], c=iris.target)
-plt.title("3D Plot")
-plt.show()
-
-# GEOGRAPHIC SIMULATION
-np.random.seed(42)
-plt.scatter(np.random.uniform(68,97,50), np.random.uniform(8,37,50))
-plt.title("Geographic Plot")
-plt.show()
-
-
-EXP 7
-
-# ==========================================
-# DIABETES PREDICTION (FINAL CLEAN VERSION)
-# ==========================================
-
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.model_selection import train_test_split
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
-
-# ------------------------------------------
-# STEP 1: LOAD DATASET (NO TRY-EXCEPT)
-# ------------------------------------------
-df = pd.read_csv("diabetes.csv")
-print("✅ Dataset loaded successfully")
-print("\n📊 Dataset Preview:\n", df.head())
-
-# ------------------------------------------
-# STEP 2: SPLIT DATA
-# ------------------------------------------
-X = df.drop("Outcome", axis=1)
-y = df["Outcome"]
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
-
-# ------------------------------------------
-# STEP 3: TRAIN MODEL
-# ------------------------------------------
-model = LogisticRegression(max_iter=1000)
-model.fit(X_train, y_train)
-
-# ------------------------------------------
-# STEP 4: PREDICTION
-# ------------------------------------------
-y_pred = model.predict(X_test)
-
-
-# ------------------------------------------
-# STEP 5: EVALUATION
-# ------------------------------------------
-print("\n✅ Accuracy:", accuracy_score(y_test, y_pred))
-print("\n📌 Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
-print("\n📌 Classification Report:\n",
-      classification_report(y_test, y_pred, zero_division=0))
-
-# ------------------------------------------
-# STEP 6: NEW PATIENT PREDICTION
-# ------------------------------------------
-sample = pd.DataFrame([[2,120,70,30,0,32.5,0.5,25]],
-columns=X.columns)
-result = model.predict(sample)
-print("\n🧪 New Patient Result:")
-print("👉 Diabetic" if result[0] == 1 else "👉 Non-Diabetic")
-
-
-# ------------------------------------------
-# STEP 7: VISUALIZATION (4 GRAPHS)
-# ------------------------------------------
-
-# 1. Count Plot
-sns.countplot(x='Outcome', data=df)
-plt.title("Diabetes Count (0 = No, 1 = Yes)")
-plt.show()
-
-# 2. Glucose vs Diabetes
-sns.boxplot(x='Outcome', y='Glucose', data=df)
-plt.title("Glucose vs Diabetes")
-plt.show()
-
-# 3. BMI vs Diabetes
-sns.boxplot(x='Outcome', y='BMI', data=df)
-plt.title("BMI vs Diabetes")
-plt.show()
-
-# 4. Correlation Heatmap
-plt.figure(figsize=(8, 6))
-sns.heatmap(df.corr(), annot=True)
-plt.title("Feature Correlation")
-plt.show()
-
-
+📄 AppTest.java
+package factorial;
+import static org.junit.Assert.*;
+import org.junit.Test;
+public class AppTest {
+    @Test
+    public void testFactorial() {
+        assertEquals(120, App.factorial(5));
+    }
+}
+🟢 UPDATED pom.xml (IMPORTANT FIX)
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>factorial</groupId>
+    <artifactId>factorial</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>factorial-app</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>factorial.App</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+🟢 PROCEDURE
+🔹 Step 1: Open Jenkins
+Go to http://localhost:8080
+Login
+🔹 Step 2: Create Pipeline Job
+Click New Item
+Name: maven-pipeline
+Select Pipeline → OK
+🔹 Step 3: Place Project in Workspace
+Open:
+%PROGRAMDATA%\Jenkins\.jenkins\workspace\maven-pipeline
+Copy:
+pom.xml
+src/
+🔹 Step 4: Add Pipeline Script
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                bat 'mvn clean package'
+            }
+        }
+        stage('Test') {
+            steps {
+                bat 'mvn test'
+            }
+        }
+        stage('Run JAR') {
+            steps {
+                bat 'java -jar target/factorial-app.jar'
+            }
+        }
+    }
+    post {
+        success {
+            archiveArtifacts artifacts: 'target/*.jar'
+        }
+    }
+}
+🔹 Step 5: Build the Pipeline
+Click Save
+Click Build Now
+🔹 Step 6: View Output
+Factorial of 5 = 120
+BUILD SUCCESS
+🔹 Step 7: Verify Artifact
+target/factorial-app.jar
+🟢 OUTPUT
+Factorial of 5 = 120
+BUILD SUCCESS--------------------------------------------------------------------------
+Exp 2
+Develop a Maven project to perform the multiplication of two numbers and execute 
+unit test cases to validate the functionality.
+🟢 PROJECT STRUCTURE
+multiplication-app/
+ ├── pom.xml
+ └── src/
+     ├── main/
+     │   └── java/
+     │       └── multiplication/
+     │           └── App.java
+     └── test/
+         └── java/
+             └── multiplication/
+                 └── AppTest.java
+🟢 JAVA PROGRAM
+📄 App.java
+package multiplication;
+public class App {
+    public static int multiply(int a, int b) {
+        return a * b;
+    }
+    public static void main(String[] args) {
+        int a = 3, b = 4;
+        System.out.println("Multiplication of " + a + " and " + b + " = " + 
+multiply(a, b));
+    }
+}
+📄 AppTest.java
+package multiplication;
+import static org.junit.Assert.*;
+import org.junit.Test;
+public class AppTest {
+    @Test
+    public void testMultiply() {
+        assertEquals(12, App.multiply(3, 4));
+    }
+}
+🟢 pom.xml
+project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>multiplication</groupId>
+    <artifactId>multiplication-app</artifactId>
+    <version>1.0</version>
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>multiplication-app</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>multiplication.App</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+</project>
+🟢 PROCEDURE
+🔹 Step 1: Create Maven Structure
+Create folders according to Maven standard structure.
+🔹 Step 2: Write Java Code
+Implement multiplication logic in App.java
+Add unit test in AppTest.java
+🔹 Step 3: Configure pom.xml
+Add JUnit dependency
+Set Java version
+🔹 Step 4: Run Maven Commands
+Step 1: Build Project
+mvn clean package
+🔹 Step 2: Go to target
+cd target
+🔹 Step 3: Run JAR
+java -jar multiplication-app.jar
+🟢 EXPECTED OUTPUT
+Multiplication of 3 and 4 = 12--------------------------------------------------------------------------
+Exp 3
+Construct a desktop Java application using Gradle to calculate the sum of the first
+n natural numbers and build the project successfully.
+🟢 PROJECT STRUCTURE
+sum-app/
+ ├── build.gradle
+ └── src/
+     └── main/
+         └── java/
+             └── sum/
+                 └── App.java
+🟢 JAVA PROGRAM
+📄 App.java
+package sum;
+import java.util.Scanner;
+public class App {
+    public static int sumN(int n) {
+        int sum = 0;
+        for(int i = 1; i <= n; i++) {
+            sum += i;
+        }
+        return sum;
+    }
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        System.out.print("Enter n: ");
+        int n = sc.nextInt();
+        System.out.println("Sum of first " + n + " natural numbers = " + sumN(n));
+    }
+}
+🟢 build.gradle
+plugins {
+id 'java'
+id 'application'
+}
+group = 'sum'
+version = '1.0'
+repositories {
+mavenCentral()
+}
+application {
+mainClass = 'sum.App'
+}
+// Enable input from keyboard
+tasks.named('run') {
+standardInput = System.in
+}
+🟢 PROCEDURE
+🔹 Step 1: Create Project Structure
+Create folders as per Gradle standard structure.
+🔹 Step 2: Write Java Program
+Implement logic to calculate sum of first n natural numbers
+Use Scanner to accept input
+🔹 Step 3: Configure Gradle
+Add java and application plugins
+Specify main class
+Enable user input using:
+standardInput = System.in
+🔹 Step 4: Build Project
+gradle build
+✔ Compiles project
+✔ Creates build folder
+🔹 Step 5: Run Application
+gradle run
+🟢 OUTPUT
+Enter n: 5
+Sum of first 5 natural numbers = 15
+🟢 BUILD OUTPUT
+BUILD SUCCESSFUL
+👉 JAR file generated at:
+build/libs/sum-app-1.0.jar----------------------------------------------------------------------
+Exp 4
+Create a Jenkins pipeline to compile a Java program and display the list of 
+directories/files present in the Jenkins workspace.
+🌐 Step 1: Open Jenkins
+Open your browser and go to:
+👉 http://localhost:8080
+Login to Jenkins.
+🔹 Step 2: Create New Job
+Click New Item
+Enter name: java-pipeline
+Select Pipeline
+Click OK
+🔹 Step 3: Prepare Workspace 
+Create java file
+App.java
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello Jenkins!");
+    }
+}
+🔹 Step 4: Configure Pipeline
+Scroll down to Pipeline section
+Definition → Pipeline script
+🔹 Step 5: Enter Pipeline Code
+pipeline {
+    agent any
+    stages {
+        stage('Compile') {
+            steps {
+                bat 'javac App.java'
+            }
+        }
+        stage('Run Program') {
+            steps {
+                bat 'java App'
+            }
+        }
+        stage('List Files') {
+            steps {
+                bat 'dir'
+            }
+        }
+    }
+}
+🔹 Step 6: Save Configuration
+Click Save
+🔹 Step 7: Build the Job
+Click Build Now 
+�
+� Step 8: View Output
+Click on the build number
+Click Console Output
+You should see:
+Hello Jenkins!--------------------------------------------------------------------------
+Exp 5
+Implement a Jenkins pipeline integrated with a Git repository to fetch and build a 
+Java application from version-controlled source code.
+Step 1: Create GitHub Repository
+A repository was created in GitHub and a Java file (App.java) was added.
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello Jenkins!");
+    }
+}
+🟢 Step 2: Open Jenkins
+Launch Jenkins in browser
+URL: http://localhost:8080
+🟢 Step 3: Create Pipeline Job
+Click New Item
+Enter name: git-java-pipeline
+Select Pipeline
+Click OK
+🟢 Step 4: Configure Pipeline
+Scroll to Pipeline section
+Select Pipeline Script
+Paste the pipeline code
+pipeline {
+    agent any
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git 'https://github.com/altrin2404/jenkins-git.git'
+            }
+        }
+        stage('List Files') {
+            steps {
+                bat 'dir'
+            }
+        }
+        stage('Compile') {
+            steps {
+                bat 'javac App.java'
+            }
+        }
+        stage('Run Program') {
+            steps {
+                bat 'java App'
+            }
+        }
+    }
+}
+🟢 Step 5: Save and Build
+Click Save
+Click Build Now
+🟢 Step 6: View Output
+Open Console Output
+Expected output:
+Cloning repository...
+App.java
+App.class
+Hello from Git + Jenkins!---------------------------------------------------------------------------------------
+Exp 6
+Design a Continuous Deployment (CD) pipeline using Jenkins scripting to automate 
+the build, test, and deployment stages of a Java application.
+🔹 Step 1: Open Jenkins
+Open browser
+Go to: http://localhost:8080
+Login to Jenkins
+🔹 Step 2: Create Pipeline Job
+Click New Item
+Name: cd-pipeline
+Select Pipeline
+Click OK
+🔹 Step 3: Create Java Source File (IMPORTANT)
+Create a file named App.java and place it inside Jenkins workspace:
+📂 Path:
+C:\ProgramData\Jenkins\.jenkins\workspace\cd-pipeline
+📄 File: App.java
+public class App {
+    public static void main(String[] args) {
+        System.out.println("CD Pipeline Running!");
+        int a = 5;
+        int b = 3;
+        int sum = a + b;
+        System.out.println("Sum = " + sum);
+        if(sum == 8){
+            System.out.println("Test Passed");
+        } else {
+            System.out.println("Test Failed");
+        }
+    }
+}
+🔹 Step 4: Add Pipeline Script
+Paste this in Jenkins:
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                bat 'javac App.java'
+            }
+        }
+        stage('Test') {
+            steps {
+                bat 'java App'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                bat 'mkdir deploy'
+                bat 'copy App.class deploy\\'
+            }
+        }
+        stage('Verify Deployment') {
+            steps {
+                bat 'dir deploy'
+            }
+        }
+    }
+}
+🔹 Step 5: Build the Pipeline
+Click Save
+Click Build Now
+🔹 Step 6: View Output
+Click build number
+Open Console Output
+🟢 OUTPUT
+CD Pipeline Running!
+Sum = 8
+Test Passed
+deploy\App.class
+BUILD SUCCESS----------------------------------------------------------------------
+Exp 7
+Develop a Jenkins pipeline with a scheduled trigger that prints a welcome message 
+and executes automatically at one-minute intervals.
+🔹 Step 1: Open Jenkins
+Navigate to: http://localhost:8080
+Log in to Jenkins
+🔹 Step 2: Create Pipeline Job
+Click New Item
+Name: scheduled-pipeline
+Select Pipeline → Click OK
+🔹 Step 3: Add Pipeline Script
+👉 Paste this:
+pipeline {
+    agent any
+    stages {
+        stage('Welcome Stage') {
+            steps {
+                bat 'echo Welcome to Jenkins Scheduled Job'
+            }
+        }
+    }
+}
+🔹 Step 4: Configure Scheduled Trigger
+👉 Scroll up to Build Triggers
+✅ Tick  Build periodically
+Enter:
+* * * * *
+🔹 Step 5: Save and Verify
+Click Save
+Wait ~1 minute
+Job runs automatically
+🔹 Step 6: View Output
+Click build number
+Open Console Output
+🟢 OUTPUT
+Welcome to Jenkins Scheduled Job
+BUILD SUCCESS----------------------------------------------------------------------
+Exp 8
+🟢 PROJECT STRUCTURE
+factorial/
+ ├── pom.xml
+ └── src/
+     ├── main/java/factorial/App.java
+     └── test/java/factorial/AppTest.java
+🟢 JAVA PROGRAM
+📄 App.java
+package factorial;
+public class App {
+    public static long factorial(int n) {
+        long f = 1;
+        for(int i = 1; i <= n; i++) {
+            f *= i;
+        }
+        return f;
+    }
+    public static void main(String[] args) {
+        int num = 5;
+        System.out.println("Factorial of " + num + " = " + factorial(num));
+    }
+}
+📄 AppTest.java
+package factorial;
+import static org.junit.Assert.*;
+import org.junit.Test;
+public class AppTest {
+    @Test
+    public void testFactorial() {
+        assertEquals(120, App.factorial(5));
+    }
+}
+🟢 pom.xml 
+�
+� Replace your build section with this:
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>factorial</groupId>
+    <artifactId>factorial</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    <build>
+        <finalName>factorial-app</finalName>
+        <!-- Make JAR executable -->
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>factorial.App</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+🟢 PROCEDURE
+🔹 Step 1: Open Jenkins
+Navigate to http://localhost:8080
+Login
+🔹 Step 2: Create Pipeline Job
+Click New Item
+Name: maven-pipeline
+Select Pipeline → OK
+🔹 Step 3: Place Project in Workspace
+Open:
+%PROGRAMDATA%\Jenkins\.jenkins\workspace\maven-pipeline
+Copy:
+pom.xml
+src/
+🔹 Step 4: Add Pipeline Script
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                bat 'mvn clean package'
+            }
+        }
+        stage('Test') {
+            steps {
+                bat 'mvn test'
+            }
+        }
+        stage('Run JAR') {
+            steps {
+                bat 'java -jar target/factorial-app.jar'
+            }
+        }
+    }
+    post {
+        success {
+            archiveArtifacts artifacts: 'target/*.jar'
+        }
+    }
+}
+🔹 Step 5: Build
+Click Save
+Click Build Now
+🔹 Step 6: Console Output
+Factorial of 5 = 120
+BUILD SUCCESS
+🔹 Step 7: Artifact
+target/factorial-app.jar
+🟢 OUTPUT
+Factorial of 5 = 120
+BUILD SUCCESS----------------------------------------------------------------------
+Exp 9
+Write an Ansible playbook to configure and deploy a simple web application.
+🐧 Step 1: Open Ubuntu (WSL)
+Just open Ubuntu from Start menu
+📦 Step 2: Install Ansible
+Run this inside Ubuntu:
+sudo apt update
+sudo apt install ansible -y
+Check:
+ansible --version
+📁 Step 3: Create Project
+mkdir ansible-web
+cd ansible-web
+📄 Step 4: Create Files
+👉 inventory
+nano inventory
+Paste:
+[web]
+localhost ansible_connection=local
+Save → Ctrl + X → Y → Enter
+👉 index.html
+nano index.html
+<html>
+<head><title>My App</title></head>
+<body>
+🚀 <h1>Hello Altrin </h1>
+</body>
+</html>
+👉 playbook.yml
+nano playbook.yml
+Paste:- name: Deploy Simple Web App
+  hosts: web
+  become: yes
+  tasks:
+    - name: Install Apache
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes
+    - name: Start Apache
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+    - name: Deploy HTML page
+      copy:
+        src: index.html
+        dest: /var/www/html/index.html
+▶ Step 5: Run Playbook
+ansible-playbook -i inventory playbook.yml
+🌐 Step 6: Open in Browser
+👉 Go to:
+http://localhost----------------------------------------------------------------------
+Exp 10
+Configure Ansible roles and develop a structured playbook to automate application 
+deployment using reusable components.
+Step 1: Create project folder
+mkdir ansible-web
+cd ansible-web
+🔹 Step 2: Create roles directory
+mkdir roles
+🔹 Step 3: Create role structure
+ansible-galaxy init roles/webserver
+🔹 Step 4: Verify role structure
+ls roles/webserver
+👉 Output should contain:
+tasks  files  handlers  templates  vars  defaults  meta
+🔹 Step 5: View folder (optional)
+explorer.exe .
+👉 Open: ansible-web → roles → webserver
+🔹 Step 6: Add tasks
+nano roles/webserver/tasks/main.yml
+Paste:- name: Install Apache
+apt:
+name: apache2
+state: present
+update_cache: yes- name: Start Apache
+service:
+name: apache2
+state: started
+enabled: yes- name: Deploy HTML page
+copy:
+src: index.html
+dest: /var/www/html/index.html
+force: yes
+Save → Ctrl + X → Y → Enter
+🔹 Step 7: Add HTML file
+nano roles/webserver/files/index.html
+Paste:
+<html>
+<body>
+<h1>Deployed using Ansible Role </h1>
+</body>
+</html>
+🔹 Step 8: Create main playbook
+nano role-playbook.yml
+Paste:- name: Deploy App using Roles
+hosts: web
+become: yes
+roles:- webserver
+🚀
+🔹 Step 9: Create inventory file
+nano inventory
+Paste:
+[web]
+localhost ansible_connection=local
+🔹 Step 10: Run playbook
+ansible-playbook -i inventory role-playbook.yml
+🔹 Step 11: View output
+Open browser:
+👉 http://localhost
+✔ Output:
+Deployed using Ansible Role 
+�
+� Step 12: If not working
+sudo service apache2 restart
+Then refresh browser
+🚀
