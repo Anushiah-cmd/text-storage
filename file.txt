@@ -1,755 +1,164 @@
-Exp 1 
-Design and implement a Maven-based build pipeline to develop a Java application 
-that computes the factorial of a given number and generates the executable JAR 
-file.
-ROJECT STRUCTURE
-factorial/
- ├── pom.xml
- └── src/
-     ├── main/java/factorial/App.java
-     └── test/java/factorial/AppTest.java
-🟢 JAVA PROGRAM
-📄 App.java
-package factorial;
-public class App {
-    public static long factorial(int n) {
-        long f = 1;
-        for(int i = 1; i <= n; i++) {
-            f *= i;
-        }
-        return f;
-    }
-    public static void main(String[] args) {
-        System.out.println("Factorial of 5 = " + factorial(5));
-    }
-}
-📄 AppTest.java
-package factorial;
-import static org.junit.Assert.*;
-import org.junit.Test;
-public class AppTest {
-    @Test
-    public void testFactorial() {
-        assertEquals(120, App.factorial(5));
-    }
-}
-🟢 UPDATED pom.xml (IMPORTANT FIX)
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>factorial</groupId>
-    <artifactId>factorial</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <build>
-        <finalName>factorial-app</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>factorial.App</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-</project>
-🟢 PROCEDURE
-🔹 Step 1: Open Jenkins
-Go to http://localhost:8080
-Login
-🔹 Step 2: Create Pipeline Job
-Click New Item
-Name: maven-pipeline
-Select Pipeline → OK
-🔹 Step 3: Place Project in Workspace
-Open:
-%PROGRAMDATA%\Jenkins\.jenkins\workspace\maven-pipeline
-Copy:
-pom.xml
-src/
-🔹 Step 4: Add Pipeline Script
-pipeline {
-    agent any
-    stages {
-        stage('Build') {
-            steps {
-                bat 'mvn clean package'
-            }
-        }
-        stage('Test') {
-            steps {
-                bat 'mvn test'
-            }
-        }
-        stage('Run JAR') {
-            steps {
-                bat 'java -jar target/factorial-app.jar'
-            }
-        }
-    }
-    post {
-        success {
-            archiveArtifacts artifacts: 'target/*.jar'
-        }
-    }
-}
-🔹 Step 5: Build the Pipeline
-Click Save
-Click Build Now
-🔹 Step 6: View Output
-Factorial of 5 = 120
-BUILD SUCCESS
-🔹 Step 7: Verify Artifact
-target/factorial-app.jar
-🟢 OUTPUT
-Factorial of 5 = 120
-BUILD SUCCESS--------------------------------------------------------------------------
-Exp 2
-Develop a Maven project to perform the multiplication of two numbers and execute 
-unit test cases to validate the functionality.
-🟢 PROJECT STRUCTURE
-multiplication-app/
- ├── pom.xml
- └── src/
-     ├── main/
-     │   └── java/
-     │       └── multiplication/
-     │           └── App.java
-     └── test/
-         └── java/
-             └── multiplication/
-                 └── AppTest.java
-🟢 JAVA PROGRAM
-📄 App.java
-package multiplication;
-public class App {
-    public static int multiply(int a, int b) {
-        return a * b;
-    }
-    public static void main(String[] args) {
-        int a = 3, b = 4;
-        System.out.println("Multiplication of " + a + " and " + b + " = " + 
-multiply(a, b));
-    }
-}
-📄 AppTest.java
-package multiplication;
-import static org.junit.Assert.*;
-import org.junit.Test;
-public class AppTest {
-    @Test
-    public void testMultiply() {
-        assertEquals(12, App.multiply(3, 4));
-    }
-}
-🟢 pom.xml
-project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>multiplication</groupId>
-    <artifactId>multiplication-app</artifactId>
-    <version>1.0</version>
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <build>
-        <finalName>multiplication-app</finalName>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>multiplication.App</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-</project>
-</project>
-🟢 PROCEDURE
-🔹 Step 1: Create Maven Structure
-Create folders according to Maven standard structure.
-🔹 Step 2: Write Java Code
-Implement multiplication logic in App.java
-Add unit test in AppTest.java
-🔹 Step 3: Configure pom.xml
-Add JUnit dependency
-Set Java version
-🔹 Step 4: Run Maven Commands
-Step 1: Build Project
-mvn clean package
-🔹 Step 2: Go to target
-cd target
-🔹 Step 3: Run JAR
-java -jar multiplication-app.jar
-🟢 EXPECTED OUTPUT
-Multiplication of 3 and 4 = 12--------------------------------------------------------------------------
-Exp 3
-Construct a desktop Java application using Gradle to calculate the sum of the first
-n natural numbers and build the project successfully.
-🟢 PROJECT STRUCTURE
-sum-app/
- ├── build.gradle
- └── src/
-     └── main/
-         └── java/
-             └── sum/
-                 └── App.java
-🟢 JAVA PROGRAM
-📄 App.java
-package sum;
-import java.util.Scanner;
-public class App {
-    public static int sumN(int n) {
-        int sum = 0;
-        for(int i = 1; i <= n; i++) {
-            sum += i;
-        }
-        return sum;
-    }
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter n: ");
-        int n = sc.nextInt();
-        System.out.println("Sum of first " + n + " natural numbers = " + sumN(n));
-    }
-}
-🟢 build.gradle
-plugins {
-id 'java'
-id 'application'
-}
-group = 'sum'
-version = '1.0'
-repositories {
-mavenCentral()
-}
-application {
-mainClass = 'sum.App'
-}
-// Enable input from keyboard
-tasks.named('run') {
-standardInput = System.in
-}
-🟢 PROCEDURE
-🔹 Step 1: Create Project Structure
-Create folders as per Gradle standard structure.
-🔹 Step 2: Write Java Program
-Implement logic to calculate sum of first n natural numbers
-Use Scanner to accept input
-🔹 Step 3: Configure Gradle
-Add java and application plugins
-Specify main class
-Enable user input using:
-standardInput = System.in
-🔹 Step 4: Build Project
-gradle build
-✔ Compiles project
-✔ Creates build folder
-🔹 Step 5: Run Application
-gradle run
-🟢 OUTPUT
-Enter n: 5
-Sum of first 5 natural numbers = 15
-🟢 BUILD OUTPUT
-BUILD SUCCESSFUL
-👉 JAR file generated at:
-build/libs/sum-app-1.0.jar----------------------------------------------------------------------
-Exp 4
-Create a Jenkins pipeline to compile a Java program and display the list of 
-directories/files present in the Jenkins workspace.
-🌐 Step 1: Open Jenkins
-Open your browser and go to:
-👉 http://localhost:8080
-Login to Jenkins.
-🔹 Step 2: Create New Job
-Click New Item
-Enter name: java-pipeline
-Select Pipeline
-Click OK
-🔹 Step 3: Prepare Workspace 
-Create java file
-App.java
-public class App {
-    public static void main(String[] args) {
-        System.out.println("Hello Jenkins!");
-    }
-}
-🔹 Step 4: Configure Pipeline
-Scroll down to Pipeline section
-Definition → Pipeline script
-🔹 Step 5: Enter Pipeline Code
-pipeline {
-    agent any
-    stages {
-        stage('Compile') {
-            steps {
-                bat 'javac App.java'
-            }
-        }
-        stage('Run Program') {
-            steps {
-                bat 'java App'
-            }
-        }
-        stage('List Files') {
-            steps {
-                bat 'dir'
-            }
-        }
-    }
-}
-🔹 Step 6: Save Configuration
-Click Save
-🔹 Step 7: Build the Job
-Click Build Now 
-�
-� Step 8: View Output
-Click on the build number
-Click Console Output
-You should see:
-Hello Jenkins!--------------------------------------------------------------------------
-Exp 5
-Implement a Jenkins pipeline integrated with a Git repository to fetch and build a 
-Java application from version-controlled source code.
-Step 1: Create GitHub Repository
-A repository was created in GitHub and a Java file (App.java) was added.
-public class App {
-    public static void main(String[] args) {
-        System.out.println("Hello Jenkins!");
-    }
-}
-🟢 Step 2: Open Jenkins
-Launch Jenkins in browser
-URL: http://localhost:8080
-🟢 Step 3: Create Pipeline Job
-Click New Item
-Enter name: git-java-pipeline
-Select Pipeline
-Click OK
-🟢 Step 4: Configure Pipeline
-Scroll to Pipeline section
-Select Pipeline Script
-Paste the pipeline code
-pipeline {
-    agent any
-    stages {
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/altrin2404/jenkins-git.git'
-            }
-        }
-        stage('List Files') {
-            steps {
-                bat 'dir'
-            }
-        }
-        stage('Compile') {
-            steps {
-                bat 'javac App.java'
-            }
-        }
-        stage('Run Program') {
-            steps {
-                bat 'java App'
-            }
-        }
-    }
-}
-🟢 Step 5: Save and Build
-Click Save
-Click Build Now
-🟢 Step 6: View Output
-Open Console Output
-Expected output:
-Cloning repository...
-App.java
-App.class
-Hello from Git + Jenkins!---------------------------------------------------------------------------------------
-Exp 6
-Design a Continuous Deployment (CD) pipeline using Jenkins scripting to automate 
-the build, test, and deployment stages of a Java application.
-🔹 Step 1: Open Jenkins
-Open browser
-Go to: http://localhost:8080
-Login to Jenkins
-🔹 Step 2: Create Pipeline Job
-Click New Item
-Name: cd-pipeline
-Select Pipeline
-Click OK
-🔹 Step 3: Create Java Source File (IMPORTANT)
-Create a file named App.java and place it inside Jenkins workspace:
-📂 Path:
-C:\ProgramData\Jenkins\.jenkins\workspace\cd-pipeline
-📄 File: App.java
-public class App {
-    public static void main(String[] args) {
-        System.out.println("CD Pipeline Running!");
-        int a = 5;
-        int b = 3;
-        int sum = a + b;
-        System.out.println("Sum = " + sum);
-        if(sum == 8){
-            System.out.println("Test Passed");
-        } else {
-            System.out.println("Test Failed");
-        }
-    }
-}
-🔹 Step 4: Add Pipeline Script
-Paste this in Jenkins:
-pipeline {
-    agent any
-    stages {
-        stage('Build') {
-            steps {
-                bat 'javac App.java'
-            }
-        }
-        stage('Test') {
-            steps {
-                bat 'java App'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                bat 'mkdir deploy'
-                bat 'copy App.class deploy\\'
-            }
-        }
-        stage('Verify Deployment') {
-            steps {
-                bat 'dir deploy'
-            }
-        }
-    }
-}
-🔹 Step 5: Build the Pipeline
-Click Save
-Click Build Now
-🔹 Step 6: View Output
-Click build number
-Open Console Output
-🟢 OUTPUT
-CD Pipeline Running!
-Sum = 8
-Test Passed
-deploy\App.class
-BUILD SUCCESS----------------------------------------------------------------------
-Exp 7
-Develop a Jenkins pipeline with a scheduled trigger that prints a welcome message 
-and executes automatically at one-minute intervals.
-🔹 Step 1: Open Jenkins
-Navigate to: http://localhost:8080
-Log in to Jenkins
-🔹 Step 2: Create Pipeline Job
-Click New Item
-Name: scheduled-pipeline
-Select Pipeline → Click OK
-🔹 Step 3: Add Pipeline Script
-👉 Paste this:
-pipeline {
-    agent any
-    stages {
-        stage('Welcome Stage') {
-            steps {
-                bat 'echo Welcome to Jenkins Scheduled Job'
-            }
-        }
-    }
-}
-🔹 Step 4: Configure Scheduled Trigger
-👉 Scroll up to Build Triggers
-✅ Tick  Build periodically
-Enter:
-* * * * *
-🔹 Step 5: Save and Verify
-Click Save
-Wait ~1 minute
-Job runs automatically
-🔹 Step 6: View Output
-Click build number
-Open Console Output
-🟢 OUTPUT
-Welcome to Jenkins Scheduled Job
-BUILD SUCCESS----------------------------------------------------------------------
-Exp 8
-🟢 PROJECT STRUCTURE
-factorial/
- ├── pom.xml
- └── src/
-     ├── main/java/factorial/App.java
-     └── test/java/factorial/AppTest.java
-🟢 JAVA PROGRAM
-📄 App.java
-package factorial;
-public class App {
-    public static long factorial(int n) {
-        long f = 1;
-        for(int i = 1; i <= n; i++) {
-            f *= i;
-        }
-        return f;
-    }
-    public static void main(String[] args) {
-        int num = 5;
-        System.out.println("Factorial of " + num + " = " + factorial(num));
-    }
-}
-📄 AppTest.java
-package factorial;
-import static org.junit.Assert.*;
-import org.junit.Test;
-public class AppTest {
-    @Test
-    public void testFactorial() {
-        assertEquals(120, App.factorial(5));
-    }
-}
-🟢 pom.xml 
-�
-� Replace your build section with this:
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>factorial</groupId>
-    <artifactId>factorial</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <build>
-        <finalName>factorial-app</finalName>
-        <!-- Make JAR executable -->
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>factorial.App</mainClass>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-</project>
-🟢 PROCEDURE
-🔹 Step 1: Open Jenkins
-Navigate to http://localhost:8080
-Login
-🔹 Step 2: Create Pipeline Job
-Click New Item
-Name: maven-pipeline
-Select Pipeline → OK
-🔹 Step 3: Place Project in Workspace
-Open:
-%PROGRAMDATA%\Jenkins\.jenkins\workspace\maven-pipeline
-Copy:
-pom.xml
-src/
-🔹 Step 4: Add Pipeline Script
-pipeline {
-    agent any
-    stages {
-        stage('Build') {
-            steps {
-                bat 'mvn clean package'
-            }
-        }
-        stage('Test') {
-            steps {
-                bat 'mvn test'
-            }
-        }
-        stage('Run JAR') {
-            steps {
-                bat 'java -jar target/factorial-app.jar'
-            }
-        }
-    }
-    post {
-        success {
-            archiveArtifacts artifacts: 'target/*.jar'
-        }
-    }
-}
-🔹 Step 5: Build
-Click Save
-Click Build Now
-🔹 Step 6: Console Output
-Factorial of 5 = 120
-BUILD SUCCESS
-🔹 Step 7: Artifact
-target/factorial-app.jar
-🟢 OUTPUT
-Factorial of 5 = 120
-BUILD SUCCESS----------------------------------------------------------------------
-Exp 9
-Write an Ansible playbook to configure and deploy a simple web application.
-🐧 Step 1: Open Ubuntu (WSL)
-Just open Ubuntu from Start menu
-📦 Step 2: Install Ansible
-Run this inside Ubuntu:
-sudo apt update
-sudo apt install ansible -y
-Check:
-ansible --version
-📁 Step 3: Create Project
-mkdir ansible-web
-cd ansible-web
-📄 Step 4: Create Files
-👉 inventory
-nano inventory
-Paste:
-[web]
-localhost ansible_connection=local
-Save → Ctrl + X → Y → Enter
-👉 index.html
-nano index.html
-<html>
-<head><title>My App</title></head>
-<body>
-🚀 <h1>Hello Altrin </h1>
-</body>
-</html>
-👉 playbook.yml
-nano playbook.yml
-Paste:- name: Deploy Simple Web App
-  hosts: web
-  become: yes
-  tasks:
-    - name: Install Apache
-      apt:
-        name: apache2
-        state: present
-        update_cache: yes
-    - name: Start Apache
-      service:
-        name: apache2
-        state: started
-        enabled: yes
-    - name: Deploy HTML page
-      copy:
-        src: index.html
-        dest: /var/www/html/index.html
-▶ Step 5: Run Playbook
-ansible-playbook -i inventory playbook.yml
-🌐 Step 6: Open in Browser
-👉 Go to:
-http://localhost----------------------------------------------------------------------
-Exp 10
-Configure Ansible roles and develop a structured playbook to automate application 
-deployment using reusable components.
-Step 1: Create project folder
-mkdir ansible-web
-cd ansible-web
-🔹 Step 2: Create roles directory
-mkdir roles
-🔹 Step 3: Create role structure
-ansible-galaxy init roles/webserver
-🔹 Step 4: Verify role structure
-ls roles/webserver
-👉 Output should contain:
-tasks  files  handlers  templates  vars  defaults  meta
-🔹 Step 5: View folder (optional)
-explorer.exe .
-👉 Open: ansible-web → roles → webserver
-🔹 Step 6: Add tasks
-nano roles/webserver/tasks/main.yml
-Paste:- name: Install Apache
-apt:
-name: apache2
-state: present
-update_cache: yes- name: Start Apache
-service:
-name: apache2
-state: started
-enabled: yes- name: Deploy HTML page
-copy:
-src: index.html
-dest: /var/www/html/index.html
-force: yes
-Save → Ctrl + X → Y → Enter
-🔹 Step 7: Add HTML file
-nano roles/webserver/files/index.html
-Paste:
-<html>
-<body>
-<h1>Deployed using Ansible Role </h1>
-</body>
-</html>
-🔹 Step 8: Create main playbook
-nano role-playbook.yml
-Paste:- name: Deploy App using Roles
-hosts: web
-become: yes
-roles:- webserver
-🚀
-🔹 Step 9: Create inventory file
-nano inventory
-Paste:
-[web]
-localhost ansible_connection=local
-🔹 Step 10: Run playbook
-ansible-playbook -i inventory role-playbook.yml
-🔹 Step 11: View output
-Open browser:
-👉 http://localhost
-✔ Output:
-Deployed using Ansible Role 
-�
-� Step 12: If not working
-sudo service apache2 restart
-Then refresh browser
-🚀
+✅ SET 1
+Q1. Develop a Python program using regular expressions to extract emails, phone numbers, and dates from unstructured text and tokenize it.
+import re
+import nltk
+nltk.download('punkt')
+
+text = """Contact: info@gmail.com, Phone: 9876543210, Date: 12-05-2024"""
+
+emails = re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z.-]+\.[a-zA-Z]{2,}', text)
+phones = re.findall(r'\b\d{10}\b', text)
+dates = re.findall(r'\b\d{2}[-/]\d{2}[-/]\d{4}\b', text)
+
+sentences = nltk.sent_tokenize(text)
+words = nltk.word_tokenize(text)
+
+print(emails, phones, dates)
+print(sentences)
+print(words)
+________________________________________
+Q2. Analyze tokenized output to identify word usage patterns.
+from nltk.probability import FreqDist
+
+fd = FreqDist(words)
+print(fd.most_common(10))
+________________________________________
+✅ SET 2
+Q1. Process text corpus using NLTK and compute frequency after removing stopwords.
+import nltk
+from nltk.corpus import stopwords
+from nltk.probability import FreqDist
+
+nltk.download('stopwords')
+nltk.download('punkt')
+
+text = "NLP makes machines understand language"
+words = nltk.word_tokenize(text)
+
+filtered = [w.lower() for w in words if w.isalpha() and w.lower() not in stopwords.words('english')]
+
+fd = FreqDist(filtered)
+print(fd.most_common(50))
+________________________________________
+Q2. Generate bigrams and find collocations.
+from nltk.collocations import BigramCollocationFinder
+from nltk.metrics import BigramAssocMeasures
+
+finder = BigramCollocationFinder.from_words(filtered)
+print(finder.nbest(BigramAssocMeasures.likelihood_ratio, 10))
+________________________________________
+✅ SET 3
+Q1. Implement search functionality using NLTK to find keyword and context.
+import nltk
+nltk.download('punkt')
+
+text = "NLP is useful. NLP is interesting."
+words = nltk.word_tokenize(text)
+
+text_obj = nltk.Text(words)
+text_obj.concordance("NLP")
+________________________________________
+Q2. Compute vocabulary size and lexical diversity.
+vocab_size = len(set(words))
+total_words = len(words)
+
+lexical_diversity = total_words / vocab_size
+
+print(vocab_size, lexical_diversity)
+________________________________________
+✅ SET 4
+Q1. Train Word2Vec model and generate embeddings.
+from gensim.models import Word2Vec
+
+sentences = [["machine", "learning", "is", "fun"]]
+model = Word2Vec(sentences, vector_size=50, window=3, min_count=1)
+
+print(model.wv['machine'])
+________________________________________
+Q2. Find similar words using the model.
+print(model.wv.most_similar('machine'))
+________________________________________
+✅ SET 5
+Q1. Design a rule-based chatbot for multiple intents.
+def chatbot(user):
+    if "hello" in user.lower():
+        return "Hi!"
+    elif "name" in user.lower():
+        return "I am a bot"
+    elif "bye" in user.lower():
+        return "Bye!"
+    elif "help" in user.lower():
+        return "How can I help?"
+    elif "course" in user.lower():
+        return "You study NLP"
+    else:
+        return "I don't understand"
+________________________________________
+Q2. Test chatbot with user input.
+while True:
+    msg = input("You: ")
+    if msg == "exit":
+        break
+    print("Bot:", chatbot(msg))
+________________________________________
+✅ SET 6
+Q1. Develop Text-to-Speech system.
+import pyttsx3
+
+engine = pyttsx3.init()
+engine.say("Hello, this is text to speech")
+engine.runAndWait()
+________________________________________
+Q2. Improve speech clarity (change rate/voice).
+engine.setProperty('rate', 150)
+engine.say("Improved speech clarity")
+engine.runAndWait()
+________________________________________
+✅ SET 7
+Q1. Implement speech recognition system.
+import speech_recognition as sr
+
+r = sr.Recognizer()
+with sr.Microphone() as source:
+    print("Speak...")
+    audio = r.listen(source)
+
+try:
+    print(r.recognize_google(audio))
+except:
+    print("Error")
+________________________________________
+Q2. Calculate Word Error Rate (WER).
+def wer(ref, hyp):
+    ref = ref.split()
+    hyp = hyp.split()
+    return abs(len(ref) - len(hyp)) / len(ref)
+
+print(wer("hello world", "hello word"))
+________________________________________
+✅ SET 8
+Q1. Extract entities using regex.
+import re
+
+text = "Price 100 on 12-05-2024 with code NLP2024"
+
+numbers = re.findall(r'\d+', text)
+dates = re.findall(r'\d{2}-\d{2}-\d{4}', text)
+terms = re.findall(r'[A-Z]+\d*', text)
+
+print(numbers, dates, terms)
+________________________________________
+Q2. Generate bigrams and visualize frequency.
+import nltk
+import matplotlib.pyplot as plt
+from nltk import bigrams
+from nltk.probability import FreqDist
+
+nltk.download('punkt')
+
+words = nltk.word_tokenize(text)
+bg = list(bigrams(words))
+
+fd = FreqDist(bg)
+fd.plot(10)
+
