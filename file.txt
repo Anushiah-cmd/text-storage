@@ -1,164 +1,634 @@
-✅ SET 1
-Q1. Develop a Python program using regular expressions to extract emails, phone numbers, and dates from unstructured text and tokenize it.
-import re
-import nltk
-nltk.download('punkt')
+EXPERIMENT 1: Caesar Cipher
 
-text = """Contact: info@gmail.com, Phone: 9876543210, Date: 12-05-2024"""
+Aim
 
-emails = re.findall(r'[a-zA-Z0-9._%+-]+@[a-zA-Z.-]+\.[a-zA-Z]{2,}', text)
-phones = re.findall(r'\b\d{10}\b', text)
-dates = re.findall(r'\b\d{2}[-/]\d{2}[-/]\d{4}\b', text)
+To encrypt and decrypt an uppercase alphabetic message using a fixed shift.
 
-sentences = nltk.sent_tokenize(text)
-words = nltk.word_tokenize(text)
+Algorithm
 
-print(emails, phones, dates)
-print(sentences)
-print(words)
-________________________________________
-Q2. Analyze tokenized output to identify word usage patterns.
-from nltk.probability import FreqDist
+Read the plaintext and a shift value.
 
-fd = FreqDist(words)
-print(fd.most_common(10))
-________________________________________
-✅ SET 2
-Q1. Process text corpus using NLTK and compute frequency after removing stopwords.
-import nltk
-from nltk.corpus import stopwords
-from nltk.probability import FreqDist
+For each letter, convert A–Z to 0–25, add the shift, and take modulo 26.
 
-nltk.download('stopwords')
-nltk.download('punkt')
+For decryption, subtract the shift modulo 26.
 
-text = "NLP makes machines understand language"
-words = nltk.word_tokenize(text)
+Display the encrypted and decrypted messages.
 
-filtered = [w.lower() for w in words if w.isalpha() and w.lower() not in stopwords.words('english')]
+Python Program
 
-fd = FreqDist(filtered)
-print(fd.most_common(50))
-________________________________________
-Q2. Generate bigrams and find collocations.
-from nltk.collocations import BigramCollocationFinder
-from nltk.metrics import BigramAssocMeasures
+def caesar(text, shift):
+    result = []
+    for ch in text.upper():
+        if "A" <= ch <= "Z":
+            result.append(chr((ord(ch) - ord("A") + shift) % 26 + ord("A")))
+        else:
+            result.append(ch)
+    return "".join(result)
 
-finder = BigramCollocationFinder.from_words(filtered)
-print(finder.nbest(BigramAssocMeasures.likelihood_ratio, 10))
-________________________________________
-✅ SET 3
-Q1. Implement search functionality using NLTK to find keyword and context.
-import nltk
-nltk.download('punkt')
+text = "CAESAR"
+shift = 5
+encrypted = caesar(text, shift)
+decrypted = caesar(encrypted, -shift)
 
-text = "NLP is useful. NLP is interesting."
-words = nltk.word_tokenize(text)
+print("Plain text:", text)
+print("Encrypted text:", encrypted)
+print("Decrypted text:", decrypted)
 
-text_obj = nltk.Text(words)
-text_obj.concordance("NLP")
-________________________________________
-Q2. Compute vocabulary size and lexical diversity.
-vocab_size = len(set(words))
-total_words = len(words)
+Sample Output
 
-lexical_diversity = total_words / vocab_size
+Plain text: CAESAR
+Encrypted text: HFJXFW
+Decrypted text: CAESAR
 
-print(vocab_size, lexical_diversity)
-________________________________________
-✅ SET 4
-Q1. Train Word2Vec model and generate embeddings.
-from gensim.models import Word2Vec
+Note
 
-sentences = [["machine", "learning", "is", "fun"]]
-model = Word2Vec(sentences, vector_size=50, window=3, min_count=1)
+This example preserves spaces and punctuation, but shifts only English letters.
 
-print(model.wv['machine'])
-________________________________________
-Q2. Find similar words using the model.
-print(model.wv.most_similar('machine'))
-________________________________________
-✅ SET 5
-Q1. Design a rule-based chatbot for multiple intents.
-def chatbot(user):
-    if "hello" in user.lower():
-        return "Hi!"
-    elif "name" in user.lower():
-        return "I am a bot"
-    elif "bye" in user.lower():
-        return "Bye!"
-    elif "help" in user.lower():
-        return "How can I help?"
-    elif "course" in user.lower():
-        return "You study NLP"
-    else:
-        return "I don't understand"
-________________________________________
-Q2. Test chatbot with user input.
-while True:
-    msg = input("You: ")
-    if msg == "exit":
-        break
-    print("Bot:", chatbot(msg))
-________________________________________
-✅ SET 6
-Q1. Develop Text-to-Speech system.
-import pyttsx3
 
-engine = pyttsx3.init()
-engine.say("Hello, this is text to speech")
-engine.runAndWait()
-________________________________________
-Q2. Improve speech clarity (change rate/voice).
-engine.setProperty('rate', 150)
-engine.say("Improved speech clarity")
-engine.runAndWait()
-________________________________________
-✅ SET 7
-Q1. Implement speech recognition system.
-import speech_recognition as sr
+EXPERIMENT 2: Playfair Cipher
 
-r = sr.Recognizer()
-with sr.Microphone() as source:
-    print("Speak...")
-    audio = r.listen(source)
+Aim
 
-try:
-    print(r.recognize_google(audio))
-except:
-    print("Error")
-________________________________________
-Q2. Calculate Word Error Rate (WER).
-def wer(ref, hyp):
-    ref = ref.split()
-    hyp = hyp.split()
-    return abs(len(ref) - len(hyp)) / len(ref)
+To encrypt and decrypt text using the Playfair digraph substitution cipher.
 
-print(wer("hello world", "hello word"))
-________________________________________
-✅ SET 8
-Q1. Extract entities using regex.
-import re
+Algorithm
 
-text = "Price 100 on 12-05-2024 with code NLP2024"
+Build a 5 × 5 key square from a keyword, removing duplicate letters and combining I/J.
 
-numbers = re.findall(r'\d+', text)
-dates = re.findall(r'\d{2}-\d{2}-\d{4}', text)
-terms = re.findall(r'[A-Z]+\d*', text)
+Prepare the plaintext as pairs; insert X between repeated letters in a pair and pad the final odd letter with X.
 
-print(numbers, dates, terms)
-________________________________________
-Q2. Generate bigrams and visualize frequency.
-import nltk
-import matplotlib.pyplot as plt
-from nltk import bigrams
-from nltk.probability import FreqDist
+For each pair, apply the same-row, same-column, or rectangle rule.
 
-nltk.download('punkt')
+For decryption, reverse the row/column shift and use the rectangle rule unchanged.
 
-words = nltk.word_tokenize(text)
-bg = list(bigrams(words))
+Python Program
 
-fd = FreqDist(bg)
-fd.plot(10)
+def make_square(keyword):
+    chars = []
+    for ch in (keyword.upper() + "ABCDEFGHIKLMNOPQRSTUVWXYZ"):
+        if ch.isalpha():
+            ch = "I" if ch == "J" else ch
+            if ch not in chars:
+                chars.append(ch)
+    return [chars[i:i + 5] for i in range(0, 25, 5)]
 
+def prepare(text):
+    text = "".join("I" if c == "J" else c for c in text.upper() if c.isalpha())
+    pairs = []
+    i = 0
+    while i < len(text):
+        a = text[i]
+        if i + 1 >= len(text):
+            b = "X"
+            i += 1
+        elif text[i + 1] == a:
+            b = "X"
+            i += 1
+        else:
+            b = text[i + 1]
+            i += 2
+        pairs.append(a + b)
+    return pairs
+
+def playfair(text, square, decrypt=False):
+    pos = {square[r][c]: (r, c) for r in range(5) for c in range(5)}
+    out = []
+    step = -1 if decrypt else 1
+    for pair in prepare(text):
+        a, b = pair
+        r1, c1 = pos[a]
+        r2, c2 = pos[b]
+        if r1 == r2:
+            out.extend([square[r1][(c1 + step) % 5],
+                        square[r2][(c2 + step) % 5]])
+        elif c1 == c2:
+            out.extend([square[(r1 + step) % 5][c1],
+                        square[(r2 + step) % 5][c2]])
+        else:
+            out.extend([square[r1][c2], square[r2][c1]])
+    return "".join(out)
+
+key_square = make_square("MONARCHY")
+plain = "HELLO"
+encrypted = playfair(plain, key_square)
+decrypted = playfair(encrypted, key_square, decrypt=True)
+print("Plain text prepared:", "".join(prepare(plain)))
+print("Encrypted:", encrypted)
+print("Decrypted (prepared text):", decrypted)
+
+Sample Output
+
+Plain text prepared: HELXLO
+Encrypted: CFSUPM
+Decrypted (prepared text): HELXLO
+
+Note
+
+Playfair decryption returns the prepared text, so filler X characters may need to be removed manually.
+
+
+EXPERIMENT 3: Hill Cipher (2 × 2)
+
+Aim
+
+To encrypt and decrypt an alphabetic message using a 2 × 2 Hill cipher key matrix modulo 26.
+
+Algorithm
+
+Convert each letter A–Z to a number from 0 to 25 and pad an odd-length message with X.
+
+Group the numbers into pairs and multiply each pair by the key matrix modulo 26.
+
+Use the modular inverse of the key matrix to decrypt the ciphertext.
+
+Convert the resulting numbers back into letters.
+
+Python Program
+
+MOD = 26
+KEY = ((3, 3), (2, 5))
+INV_KEY = ((15, 17), (20, 9))  # inverse of KEY modulo 26
+
+def hill_transform(text, matrix):
+    text = "".join(c for c in text.upper() if c.isalpha())
+    if len(text) % 2:
+        text += "X"
+    result = []
+    for i in range(0, len(text), 2):
+        x = ord(text[i]) - ord("A")
+        y = ord(text[i + 1]) - ord("A")
+        a = (matrix[0][0] * x + matrix[0][1] * y) % MOD
+        b = (matrix[1][0] * x + matrix[1][1] * y) % MOD
+        result.extend([chr(a + 65), chr(b + 65)])
+    return "".join(result)
+
+plain = "HELP"
+encrypted = hill_transform(plain, KEY)
+decrypted = hill_transform(encrypted, INV_KEY)
+print("Plain text:", plain)
+print("Encrypted:", encrypted)
+print("Decrypted:", decrypted)
+
+Sample Output
+
+Plain text: HELP
+Encrypted: HIAT
+Decrypted: HELP
+
+Note
+
+The selected key is invertible modulo 26. A Hill cipher is not secure for real-world use.
+
+
+EXPERIMENT 4: Vigenère Cipher
+
+Aim
+
+To encrypt and decrypt alphabetic text using a repeating keyword.
+
+Algorithm
+
+Choose a plaintext and a keyword.
+
+Repeat the keyword until it matches the plaintext length.
+
+Encrypt each letter by adding the plaintext and key values modulo 26.
+
+Decrypt by subtracting the key value modulo 26.
+
+Python Program
+
+def vigenere(text, key, decrypt=False):
+    text = "".join(c for c in text.upper() if c.isalpha())
+    key = "".join(c for c in key.upper() if c.isalpha())
+    output = []
+    for i, ch in enumerate(text):
+        value = ord(ch) - 65
+        shift = ord(key[i % len(key)]) - 65
+        value = (value - shift if decrypt else value + shift) % 26
+        output.append(chr(value + 65))
+    return "".join(output)
+
+text = "ATTACKBYDAWN"
+key = "LEMON"
+encrypted = vigenere(text, key)
+decrypted = vigenere(encrypted, key, decrypt=True)
+print("Plain text:", text)
+print("Encrypted:", encrypted)
+print("Decrypted:", decrypted)
+
+Sample Output
+
+Plain text: ATTACKBYDAWN
+Encrypted: LXFOPVEFRNHR
+Decrypted: ATTACKBYDAWN
+
+
+EXPERIMENT 5: Rail Fence Cipher
+
+Aim
+
+To encrypt and decrypt a message by writing its characters in a zigzag pattern across rails.
+
+Algorithm
+
+Choose the number of rails.
+
+For encryption, write the text in a down-and-up zigzag pattern.
+
+Read each rail from left to right to obtain the ciphertext.
+
+For decryption, reconstruct the zigzag positions, fill them with ciphertext characters row by row, then read along the zigzag.
+
+Python Program
+
+def rail_pattern(length, rails):
+    pattern = []
+    row, direction = 0, 1
+    for _ in range(length):
+        pattern.append(row)
+        if row == 0:
+            direction = 1
+        elif row == rails - 1:
+            direction = -1
+        row += direction
+    return pattern
+
+def rail_encrypt(text, rails):
+    if rails <= 1:
+        return text
+    rows = [[] for _ in range(rails)]
+    for ch, row in zip(text, rail_pattern(len(text), rails)):
+        rows[row].append(ch)
+    return "".join("".join(row) for row in rows)
+
+def rail_decrypt(cipher, rails):
+    if rails <= 1:
+        return cipher
+    pattern = rail_pattern(len(cipher), rails)
+    counts = [pattern.count(r) for r in range(rails)]
+    rows, index = [], 0
+    for count in counts:
+        rows.append(list(cipher[index:index + count]))
+        index += count
+    positions = [0] * rails
+    result = []
+    for row in pattern:
+        result.append(rows[row][positions[row]])
+        positions[row] += 1
+    return "".join(result)
+
+text = "HELLOWORLD"
+encrypted = rail_encrypt(text, 3)
+decrypted = rail_decrypt(encrypted, 3)
+print("Plain text:", text)
+print("Encrypted:", encrypted)
+print("Decrypted:", decrypted)
+
+Sample Output
+
+Plain text: HELLOWORLD
+Encrypted: HOLELWRDLO
+Decrypted: HELLOWORLD
+
+
+EXPERIMENT 6: Row and Column Transformation (Columnar Transposition)
+
+Aim
+
+To encrypt and decrypt a message by writing it into rows and reading it column by column.
+
+Algorithm
+
+Choose a fixed number of columns.
+
+Write the plaintext from left to right into rows.
+
+Pad the final row with X characters so the rectangle is complete.
+
+Read down each column to encrypt; for decryption, refill columns and read across rows.
+
+Python Program
+
+def columnar_encrypt(text, columns):
+    text = "".join(c for c in text.upper() if c.isalpha())
+    while len(text) % columns:
+        text += "X"
+    rows = [text[i:i + columns] for i in range(0, len(text), columns)]
+    return "".join(row[c] for c in range(columns) for row in rows)
+
+def columnar_decrypt(cipher, columns):
+    rows = len(cipher) // columns
+    grid = [[""] * columns for _ in range(rows)]
+    k = 0
+    for c in range(columns):
+        for r in range(rows):
+            grid[r][c] = cipher[k]
+            k += 1
+    return "".join("".join(row) for row in grid).rstrip("X")
+
+text = "HELLOWORLD"
+columns = 4
+encrypted = columnar_encrypt(text, columns)
+decrypted = columnar_decrypt(encrypted, columns)
+print("Plain text:", text)
+print("Encrypted:", encrypted)
+print("Decrypted:", decrypted)
+
+Sample Output
+
+Plain text: HELLOWORLD
+Encrypted: HOLEWDLOXLRX
+Decrypted: HELLOWORLD
+
+Note
+
+Padding X characters are removed at the end during this example; if the original message itself ends in X, preserve its original length separately.
+
+
+EXPERIMENT 7: DES Symmetric Encryption
+
+Aim
+
+To demonstrate DES encryption and decryption using a generated secret key.
+
+Algorithm
+
+Generate a DES secret key.
+
+Create a DES cipher object using an educational mode and padding.
+
+Encode the plaintext into bytes and encrypt it.
+
+Decrypt the ciphertext with the same key and display the result.
+
+Python Program
+
+from Crypto.Cipher import DES
+from Crypto.Random import get_random_bytes
+import base64
+
+def pad(data):
+    amount = 8 - (len(data) % 8)
+    return data + bytes([amount]) * amount
+
+def unpad(data):
+    return data[:-data[-1]]
+
+key = get_random_bytes(8)  # DES key size is 8 bytes (56 effective key bits)
+message = b"HELLO"
+cipher = DES.new(key, DES.MODE_ECB)
+encrypted = cipher.encrypt(pad(message))
+decrypted = unpad(DES.new(key, DES.MODE_ECB).decrypt(encrypted))
+
+print("Message:", message.decode())
+print("Encrypted (Base64):", base64.b64encode(encrypted).decode())
+print("Decrypted:", decrypted.decode())
+
+Sample Output
+
+Message: HELLO
+Encrypted (Base64): (varies each run only if the key/mode changes)
+Decrypted: HELLO
+
+Note
+
+DES is obsolete and insecure. ECB is shown only to keep the lab example short; do not use DES for real data.
+
+
+EXPERIMENT 8: AES Symmetric Encryption
+
+Aim
+
+To encrypt and decrypt a message using AES with authenticated EAX mode.
+
+Algorithm
+
+Create a 16-byte AES key for AES-128.
+
+Create an AES cipher in EAX mode, which produces a nonce and authentication tag.
+
+Encrypt the plaintext and save the ciphertext, nonce, and tag.
+
+Decrypt and verify the tag to confirm that the data has not been altered.
+
+Python Program
+
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+import base64
+
+key = get_random_bytes(16)  # AES-128 key
+message = b"www.annauniv.edu"
+
+cipher = AES.new(key, AES.MODE_EAX)
+ciphertext, tag = cipher.encrypt_and_digest(message)
+
+print("Original message:", message.decode())
+print("Nonce (Base64):", base64.b64encode(cipher.nonce).decode())
+print("Ciphertext (Base64):", base64.b64encode(ciphertext).decode())
+print("Tag (Base64):", base64.b64encode(tag).decode())
+
+decrypt_cipher = AES.new(key, AES.MODE_EAX, nonce=cipher.nonce)
+plaintext = decrypt_cipher.decrypt_and_verify(ciphertext, tag)
+print("Decrypted message:", plaintext.decode())
+
+Sample Output
+
+Original message: www.annauniv.edu
+Nonce (Base64): (varies each run)
+Ciphertext (Base64): (varies each run)
+Tag (Base64): (varies each run)
+Decrypted message: www.annauniv.edu
+
+Note
+
+The key and nonce must be stored/transmitted appropriately for a real application. Never reuse an EAX nonce with the same key.
+
+
+EXPERIMENT 9: RSA Algorithm
+
+Aim
+
+To generate a small educational RSA key pair, encrypt an integer message, and decrypt the ciphertext.
+
+Algorithm
+
+Choose two prime numbers p and q.
+
+Calculate n = p × q and φ(n) = (p − 1)(q − 1).
+
+Choose e such that gcd(e, φ(n)) = 1.
+
+Find d, the modular inverse of e modulo φ(n).
+
+Encrypt with C = M^e mod n and decrypt with M = C^d mod n.
+
+Python Program
+
+from math import gcd
+
+p, q = 53, 59
+message = 89
+n = p * q
+phi = (p - 1) * (q - 1)
+
+e = 2
+while gcd(e, phi) != 1:
+    e += 1
+
+d = pow(e, -1, phi)  # modular inverse
+ciphertext = pow(message, e, n)
+decrypted = pow(ciphertext, d, n)
+
+print("Public key (n, e):", (n, e))
+print("Private exponent d:", d)
+print("Message:", message)
+print("Ciphertext:", ciphertext)
+print("Decrypted:", decrypted)
+
+Sample Output
+
+Public key (n, e): (3127, 3)
+Private exponent d: 2011
+Message: 89
+Ciphertext: 1394
+Decrypted: 89
+
+Note
+
+These tiny numbers are for learning only. Real RSA requires secure key sizes and a standard padding scheme such as OAEP.
+
+
+EXPERIMENT 10: Diffie–Hellman Key Exchange
+
+Aim
+
+To demonstrate how two parties can calculate the same shared secret using public parameters and private values.
+
+Algorithm
+
+Choose public prime p and generator g.
+
+User A chooses private value a and computes A = g^a mod p.
+
+User B chooses private value b and computes B = g^b mod p.
+
+Exchange A and B, then compute sA = B^a mod p and sB = A^b mod p.
+
+Compare the two shared secrets.
+
+Python Program
+
+p, g = 23, 5
+a, b = 4, 3  # private values for this demonstration
+
+A = pow(g, a, p)
+B = pow(g, b, p)
+shared_a = pow(B, a, p)
+shared_b = pow(A, b, p)
+
+print("User A sends:", A)
+print("User B sends:", B)
+print("User A shared secret:", shared_a)
+print("User B shared secret:", shared_b)
+print("Success: Shared secrets match!" if shared_a == shared_b
+      else "Error: Shared secrets do not match")
+
+Sample Output
+
+User A sends: 4
+User B sends: 10
+User A shared secret: 18
+User B shared secret: 18
+Success: Shared secrets match!
+
+Note
+
+The small parameters are not secure. Real implementations use standardized groups and authenticated key exchange.
+
+
+EXPERIMENT 11: SHA-1 Hash Algorithm
+
+Aim
+
+To generate and display the SHA-1 message digest of an input string.
+
+Algorithm
+
+Read or define the input message.
+
+Encode the message into bytes.
+
+Calculate the SHA-1 digest using Python’s hashlib library.
+
+Display the digest in hexadecimal format.
+
+Python Program
+
+import hashlib
+
+message = ""
+digest = hashlib.sha1(message.encode("utf-8")).hexdigest()
+
+print("Algorithm: SHA-1")
+print("Input:", repr(message))
+print("SHA-1 digest:", digest.upper())
+
+Sample Output
+
+Algorithm: SHA-1
+Input: ''
+SHA-1 digest: DA39A3EE5E6B4B0D3255BFEF95601890AFD80709
+
+Note
+
+SHA-1 is no longer recommended for security-sensitive uses because collision attacks are practical. Prefer SHA-256 or SHA-3 for new designs.
+
+
+EXPERIMENT 12: Digital Signature Algorithm (DSA) — Educational Example
+
+Aim
+
+To demonstrate DSA-style signing and verification using small illustrative parameters.
+
+Algorithm
+
+Set public parameters p, q, and g, then choose private key x.
+
+Calculate public key y = g^x mod p.
+
+Choose a per-message secret k and calculate r and s.
+
+Calculate the verification values w, u1, u2, and v.
+
+If v equals r, report that the signature verifies.
+
+Python Program
+
+# Tiny illustrative parameters only; do not use this code for real signatures.
+p, q, g = 23, 11, 2
+x = 3          # private key
+k = 6          # per-message secret; must be fresh and secret in real DSA
+h = 5          # illustrative message hash integer
+
+y = pow(g, x, p)
+r = pow(g, k, p) % q
+s = (pow(k, -1, q) * (h + x * r)) % q
+
+w = pow(s, -1, q)
+u1 = (h * w) % q
+u2 = (r * w) % q
+v = (pow(g, u1, p) * pow(y, u2, p) % p) % q
+
+print("Public key y:", y)
+print("Signature (r, s):", (r, s))
+print("Verification value v:", v)
+print("Signature Verified" if v == r else "Invalid Signature")
+
+Sample Output
+
+Public key y: 8
+Signature (r, s): (7, 8)
+Verification value v: 7
+Signature Verified
