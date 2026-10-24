@@ -1,634 +1,351 @@
-EXPERIMENT 1: Caesar Cipher
-
-Aim
-
-To encrypt and decrypt an uppercase alphabetic message using a fixed shift.
-
-Algorithm
-
-Read the plaintext and a shift value.
-
-For each letter, convert A–Z to 0–25, add the shift, and take modulo 26.
-
-For decryption, subtract the shift modulo 26.
-
-Display the encrypted and decrypted messages.
-
-Python Program
-
-def caesar(text, shift):
-    result = []
-    for ch in text.upper():
-        if "A" <= ch <= "Z":
-            result.append(chr((ord(ch) - ord("A") + shift) % 26 + ord("A")))
-        else:
-            result.append(ch)
-    return "".join(result)
-
-text = "CAESAR"
-shift = 5
-encrypted = caesar(text, shift)
-decrypted = caesar(encrypted, -shift)
-
-print("Plain text:", text)
-print("Encrypted text:", encrypted)
-print("Decrypted text:", decrypted)
-
-Sample Output
-
-Plain text: CAESAR
-Encrypted text: HFJXFW
-Decrypted text: CAESAR
-
-Note
-
-This example preserves spaces and punctuation, but shifts only English letters.
-
-
-EXPERIMENT 2: Playfair Cipher
-
-Aim
-
-To encrypt and decrypt text using the Playfair digraph substitution cipher.
-
-Algorithm
-
-Build a 5 × 5 key square from a keyword, removing duplicate letters and combining I/J.
-
-Prepare the plaintext as pairs; insert X between repeated letters in a pair and pad the final odd letter with X.
-
-For each pair, apply the same-row, same-column, or rectangle rule.
-
-For decryption, reverse the row/column shift and use the rectangle rule unchanged.
-
-Python Program
-
-def make_square(keyword):
-    chars = []
-    for ch in (keyword.upper() + "ABCDEFGHIKLMNOPQRSTUVWXYZ"):
-        if ch.isalpha():
-            ch = "I" if ch == "J" else ch
-            if ch not in chars:
-                chars.append(ch)
-    return [chars[i:i + 5] for i in range(0, 25, 5)]
-
-def prepare(text):
-    text = "".join("I" if c == "J" else c for c in text.upper() if c.isalpha())
-    pairs = []
-    i = 0
-    while i < len(text):
-        a = text[i]
-        if i + 1 >= len(text):
-            b = "X"
-            i += 1
-        elif text[i + 1] == a:
-            b = "X"
-            i += 1
-        else:
-            b = text[i + 1]
-            i += 2
-        pairs.append(a + b)
-    return pairs
-
-def playfair(text, square, decrypt=False):
-    pos = {square[r][c]: (r, c) for r in range(5) for c in range(5)}
-    out = []
-    step = -1 if decrypt else 1
-    for pair in prepare(text):
-        a, b = pair
-        r1, c1 = pos[a]
-        r2, c2 = pos[b]
-        if r1 == r2:
-            out.extend([square[r1][(c1 + step) % 5],
-                        square[r2][(c2 + step) % 5]])
-        elif c1 == c2:
-            out.extend([square[(r1 + step) % 5][c1],
-                        square[(r2 + step) % 5][c2]])
-        else:
-            out.extend([square[r1][c2], square[r2][c1]])
-    return "".join(out)
-
-key_square = make_square("MONARCHY")
-plain = "HELLO"
-encrypted = playfair(plain, key_square)
-decrypted = playfair(encrypted, key_square, decrypt=True)
-print("Plain text prepared:", "".join(prepare(plain)))
-print("Encrypted:", encrypted)
-print("Decrypted (prepared text):", decrypted)
-
-Sample Output
-
-Plain text prepared: HELXLO
-Encrypted: CFSUPM
-Decrypted (prepared text): HELXLO
-
-Note
-
-Playfair decryption returns the prepared text, so filler X characters may need to be removed manually.
-
-
-EXPERIMENT 3: Hill Cipher (2 × 2)
-
-Aim
-
-To encrypt and decrypt an alphabetic message using a 2 × 2 Hill cipher key matrix modulo 26.
-
-Algorithm
-
-Convert each letter A–Z to a number from 0 to 25 and pad an odd-length message with X.
-
-Group the numbers into pairs and multiply each pair by the key matrix modulo 26.
-
-Use the modular inverse of the key matrix to decrypt the ciphertext.
-
-Convert the resulting numbers back into letters.
-
-Python Program
-
-MOD = 26
-KEY = ((3, 3), (2, 5))
-INV_KEY = ((15, 17), (20, 9))  # inverse of KEY modulo 26
-
-def hill_transform(text, matrix):
-    text = "".join(c for c in text.upper() if c.isalpha())
-    if len(text) % 2:
-        text += "X"
-    result = []
-    for i in range(0, len(text), 2):
-        x = ord(text[i]) - ord("A")
-        y = ord(text[i + 1]) - ord("A")
-        a = (matrix[0][0] * x + matrix[0][1] * y) % MOD
-        b = (matrix[1][0] * x + matrix[1][1] * y) % MOD
-        result.extend([chr(a + 65), chr(b + 65)])
-    return "".join(result)
-
-plain = "HELP"
-encrypted = hill_transform(plain, KEY)
-decrypted = hill_transform(encrypted, INV_KEY)
-print("Plain text:", plain)
-print("Encrypted:", encrypted)
-print("Decrypted:", decrypted)
-
-Sample Output
-
-Plain text: HELP
-Encrypted: HIAT
-Decrypted: HELP
-
-Note
-
-The selected key is invertible modulo 26. A Hill cipher is not secure for real-world use.
-
-
-EXPERIMENT 4: Vigenère Cipher
-
-Aim
-
-To encrypt and decrypt alphabetic text using a repeating keyword.
-
-Algorithm
-
-Choose a plaintext and a keyword.
-
-Repeat the keyword until it matches the plaintext length.
-
-Encrypt each letter by adding the plaintext and key values modulo 26.
-
-Decrypt by subtracting the key value modulo 26.
-
-Python Program
-
-def vigenere(text, key, decrypt=False):
-    text = "".join(c for c in text.upper() if c.isalpha())
-    key = "".join(c for c in key.upper() if c.isalpha())
-    output = []
-    for i, ch in enumerate(text):
-        value = ord(ch) - 65
-        shift = ord(key[i % len(key)]) - 65
-        value = (value - shift if decrypt else value + shift) % 26
-        output.append(chr(value + 65))
-    return "".join(output)
-
-text = "ATTACKBYDAWN"
-key = "LEMON"
-encrypted = vigenere(text, key)
-decrypted = vigenere(encrypted, key, decrypt=True)
-print("Plain text:", text)
-print("Encrypted:", encrypted)
-print("Decrypted:", decrypted)
-
-Sample Output
-
-Plain text: ATTACKBYDAWN
-Encrypted: LXFOPVEFRNHR
-Decrypted: ATTACKBYDAWN
-
-
-EXPERIMENT 5: Rail Fence Cipher
-
-Aim
-
-To encrypt and decrypt a message by writing its characters in a zigzag pattern across rails.
-
-Algorithm
-
-Choose the number of rails.
-
-For encryption, write the text in a down-and-up zigzag pattern.
-
-Read each rail from left to right to obtain the ciphertext.
-
-For decryption, reconstruct the zigzag positions, fill them with ciphertext characters row by row, then read along the zigzag.
-
-Python Program
-
-def rail_pattern(length, rails):
-    pattern = []
-    row, direction = 0, 1
-    for _ in range(length):
-        pattern.append(row)
-        if row == 0:
-            direction = 1
-        elif row == rails - 1:
-            direction = -1
-        row += direction
-    return pattern
-
-def rail_encrypt(text, rails):
-    if rails <= 1:
-        return text
-    rows = [[] for _ in range(rails)]
-    for ch, row in zip(text, rail_pattern(len(text), rails)):
-        rows[row].append(ch)
-    return "".join("".join(row) for row in rows)
-
-def rail_decrypt(cipher, rails):
-    if rails <= 1:
-        return cipher
-    pattern = rail_pattern(len(cipher), rails)
-    counts = [pattern.count(r) for r in range(rails)]
-    rows, index = [], 0
-    for count in counts:
-        rows.append(list(cipher[index:index + count]))
-        index += count
-    positions = [0] * rails
-    result = []
-    for row in pattern:
-        result.append(rows[row][positions[row]])
-        positions[row] += 1
-    return "".join(result)
-
-text = "HELLOWORLD"
-encrypted = rail_encrypt(text, 3)
-decrypted = rail_decrypt(encrypted, 3)
-print("Plain text:", text)
-print("Encrypted:", encrypted)
-print("Decrypted:", decrypted)
-
-Sample Output
-
-Plain text: HELLOWORLD
-Encrypted: HOLELWRDLO
-Decrypted: HELLOWORLD
-
-
-EXPERIMENT 6: Row and Column Transformation (Columnar Transposition)
-
-Aim
-
-To encrypt and decrypt a message by writing it into rows and reading it column by column.
-
-Algorithm
-
-Choose a fixed number of columns.
-
-Write the plaintext from left to right into rows.
-
-Pad the final row with X characters so the rectangle is complete.
-
-Read down each column to encrypt; for decryption, refill columns and read across rows.
-
-Python Program
-
-def columnar_encrypt(text, columns):
-    text = "".join(c for c in text.upper() if c.isalpha())
-    while len(text) % columns:
-        text += "X"
-    rows = [text[i:i + columns] for i in range(0, len(text), columns)]
-    return "".join(row[c] for c in range(columns) for row in rows)
-
-def columnar_decrypt(cipher, columns):
-    rows = len(cipher) // columns
-    grid = [[""] * columns for _ in range(rows)]
-    k = 0
-    for c in range(columns):
-        for r in range(rows):
-            grid[r][c] = cipher[k]
-            k += 1
-    return "".join("".join(row) for row in grid).rstrip("X")
-
-text = "HELLOWORLD"
-columns = 4
-encrypted = columnar_encrypt(text, columns)
-decrypted = columnar_decrypt(encrypted, columns)
-print("Plain text:", text)
-print("Encrypted:", encrypted)
-print("Decrypted:", decrypted)
-
-Sample Output
-
-Plain text: HELLOWORLD
-Encrypted: HOLEWDLOXLRX
-Decrypted: HELLOWORLD
-
-Note
-
-Padding X characters are removed at the end during this example; if the original message itself ends in X, preserve its original length separately.
-
-
-EXPERIMENT 7: DES Symmetric Encryption
-
-Aim
-
-To demonstrate DES encryption and decryption using a generated secret key.
-
-Algorithm
-
-Generate a DES secret key.
-
-Create a DES cipher object using an educational mode and padding.
-
-Encode the plaintext into bytes and encrypt it.
-
-Decrypt the ciphertext with the same key and display the result.
-
-Python Program
-
-from Crypto.Cipher import DES
-from Crypto.Random import get_random_bytes
-import base64
-
-def pad(data):
-    amount = 8 - (len(data) % 8)
-    return data + bytes([amount]) * amount
-
-def unpad(data):
-    return data[:-data[-1]]
-
-key = get_random_bytes(8)  # DES key size is 8 bytes (56 effective key bits)
-message = b"HELLO"
-cipher = DES.new(key, DES.MODE_ECB)
-encrypted = cipher.encrypt(pad(message))
-decrypted = unpad(DES.new(key, DES.MODE_ECB).decrypt(encrypted))
-
-print("Message:", message.decode())
-print("Encrypted (Base64):", base64.b64encode(encrypted).decode())
-print("Decrypted:", decrypted.decode())
-
-Sample Output
-
-Message: HELLO
-Encrypted (Base64): (varies each run only if the key/mode changes)
-Decrypted: HELLO
-
-Note
-
-DES is obsolete and insecure. ECB is shown only to keep the lab example short; do not use DES for real data.
-
-
-EXPERIMENT 8: AES Symmetric Encryption
-
-Aim
-
-To encrypt and decrypt a message using AES with authenticated EAX mode.
-
-Algorithm
-
-Create a 16-byte AES key for AES-128.
-
-Create an AES cipher in EAX mode, which produces a nonce and authentication tag.
-
-Encrypt the plaintext and save the ciphertext, nonce, and tag.
-
-Decrypt and verify the tag to confirm that the data has not been altered.
-
-Python Program
-
-from Crypto.Cipher import AES
-from Crypto.Random import get_random_bytes
-import base64
-
-key = get_random_bytes(16)  # AES-128 key
-message = b"www.annauniv.edu"
-
-cipher = AES.new(key, AES.MODE_EAX)
-ciphertext, tag = cipher.encrypt_and_digest(message)
-
-print("Original message:", message.decode())
-print("Nonce (Base64):", base64.b64encode(cipher.nonce).decode())
-print("Ciphertext (Base64):", base64.b64encode(ciphertext).decode())
-print("Tag (Base64):", base64.b64encode(tag).decode())
-
-decrypt_cipher = AES.new(key, AES.MODE_EAX, nonce=cipher.nonce)
-plaintext = decrypt_cipher.decrypt_and_verify(ciphertext, tag)
-print("Decrypted message:", plaintext.decode())
-
-Sample Output
-
-Original message: www.annauniv.edu
-Nonce (Base64): (varies each run)
-Ciphertext (Base64): (varies each run)
-Tag (Base64): (varies each run)
-Decrypted message: www.annauniv.edu
-
-Note
-
-The key and nonce must be stored/transmitted appropriately for a real application. Never reuse an EAX nonce with the same key.
-
-
-EXPERIMENT 9: RSA Algorithm
-
-Aim
-
-To generate a small educational RSA key pair, encrypt an integer message, and decrypt the ciphertext.
-
-Algorithm
-
-Choose two prime numbers p and q.
-
-Calculate n = p × q and φ(n) = (p − 1)(q − 1).
-
-Choose e such that gcd(e, φ(n)) = 1.
-
-Find d, the modular inverse of e modulo φ(n).
-
-Encrypt with C = M^e mod n and decrypt with M = C^d mod n.
-
-Python Program
-
-from math import gcd
-
-p, q = 53, 59
-message = 89
-n = p * q
-phi = (p - 1) * (q - 1)
-
-e = 2
-while gcd(e, phi) != 1:
-    e += 1
-
-d = pow(e, -1, phi)  # modular inverse
-ciphertext = pow(message, e, n)
-decrypted = pow(ciphertext, d, n)
-
-print("Public key (n, e):", (n, e))
-print("Private exponent d:", d)
-print("Message:", message)
-print("Ciphertext:", ciphertext)
-print("Decrypted:", decrypted)
-
-Sample Output
-
-Public key (n, e): (3127, 3)
-Private exponent d: 2011
-Message: 89
-Ciphertext: 1394
-Decrypted: 89
-
-Note
-
-These tiny numbers are for learning only. Real RSA requires secure key sizes and a standard padding scheme such as OAEP.
-
-
-EXPERIMENT 10: Diffie–Hellman Key Exchange
-
-Aim
-
-To demonstrate how two parties can calculate the same shared secret using public parameters and private values.
-
-Algorithm
-
-Choose public prime p and generator g.
-
-User A chooses private value a and computes A = g^a mod p.
-
-User B chooses private value b and computes B = g^b mod p.
-
-Exchange A and B, then compute sA = B^a mod p and sB = A^b mod p.
-
-Compare the two shared secrets.
-
-Python Program
-
-p, g = 23, 5
-a, b = 4, 3  # private values for this demonstration
-
-A = pow(g, a, p)
-B = pow(g, b, p)
-shared_a = pow(B, a, p)
-shared_b = pow(A, b, p)
-
-print("User A sends:", A)
-print("User B sends:", B)
-print("User A shared secret:", shared_a)
-print("User B shared secret:", shared_b)
-print("Success: Shared secrets match!" if shared_a == shared_b
-      else "Error: Shared secrets do not match")
-
-Sample Output
-
-User A sends: 4
-User B sends: 10
-User A shared secret: 18
-User B shared secret: 18
-Success: Shared secrets match!
-
-Note
-
-The small parameters are not secure. Real implementations use standardized groups and authenticated key exchange.
-
-
-EXPERIMENT 11: SHA-1 Hash Algorithm
-
-Aim
-
-To generate and display the SHA-1 message digest of an input string.
-
-Algorithm
-
-Read or define the input message.
-
-Encode the message into bytes.
-
-Calculate the SHA-1 digest using Python’s hashlib library.
-
-Display the digest in hexadecimal format.
-
-Python Program
-
-import hashlib
-
-message = ""
-digest = hashlib.sha1(message.encode("utf-8")).hexdigest()
-
-print("Algorithm: SHA-1")
-print("Input:", repr(message))
-print("SHA-1 digest:", digest.upper())
-
-Sample Output
-
-Algorithm: SHA-1
-Input: ''
-SHA-1 digest: DA39A3EE5E6B4B0D3255BFEF95601890AFD80709
-
-Note
-
-SHA-1 is no longer recommended for security-sensitive uses because collision attacks are practical. Prefer SHA-256 or SHA-3 for new designs.
-
-
-EXPERIMENT 12: Digital Signature Algorithm (DSA) — Educational Example
-
-Aim
-
-To demonstrate DSA-style signing and verification using small illustrative parameters.
-
-Algorithm
-
-Set public parameters p, q, and g, then choose private key x.
-
-Calculate public key y = g^x mod p.
-
-Choose a per-message secret k and calculate r and s.
-
-Calculate the verification values w, u1, u2, and v.
-
-If v equals r, report that the signature verifies.
-
-Python Program
-
-# Tiny illustrative parameters only; do not use this code for real signatures.
-p, q, g = 23, 11, 2
-x = 3          # private key
-k = 6          # per-message secret; must be fresh and secret in real DSA
-h = 5          # illustrative message hash integer
-
-y = pow(g, x, p)
-r = pow(g, k, p) % q
-s = (pow(k, -1, q) * (h + x * r)) % q
-
-w = pow(s, -1, q)
-u1 = (h * w) % q
-u2 = (r * w) % q
-v = (pow(g, u1, p) * pow(y, u2, p) % p) % q
-
-print("Public key y:", y)
-print("Signature (r, s):", (r, s))
-print("Verification value v:", v)
-print("Signature Verified" if v == r else "Invalid Signature")
-
-Sample Output
-
-Public key y: 8
-Signature (r, s): (7, 8)
-Verification value v: 7
-Signature Verified
+EXPERIMENT 01
+Newsletter Subscription and Brand Analysis
+Lab manual reference: pages 1-5
+AIM
+To subscribe to a weekly or quarterly newsletter and analyze how its content and structure help in
+building brand awareness and attracting potential customers.
+PROBLEM DESCRIPTION
+A newsletter is a marketing tool used by companies to share information, updates, offers and promotions.
+It helps maintain communication with existing customers and attract new customers. In this study, we
+analyze a travel newsletter and examine how its content and design support company branding.
+DIGITAL MARKETING STRATEGY
+Case study: Where Baltimore travel magazine. This seasonal travel magazine provides recommendations
+about tourist attractions, shopping, dining, entertainment and local transportation.
+1. Content analysis
+• Recommendations: Popular places for first-time visitors, couples and luxury travelers.
+• Shopping: Department stores, shopping areas and local boutiques.
+• Museums and attractions: Historical buildings, museums and cultural centres.
+• Dining: Restaurants and local food recommendations.
+• Entertainment: Theatres, music, events and seasonal activities.
+• Navigation: Maps, local guidance and transportation information.
+2. Structural analysis
+• Attractive headings, images and a clear table of contents.
+• Sections arranged by category for easy reading.
+• Addresses, contact details and maps for planning visits.
+• Social media links to encourage further engagement.
+3. Brand awareness and customer segments
+• Useful, regular content increases recognition and trust.
+• Pictures and a consistent layout make the brand memorable.
+• Readers include tourists, families, couples, shoppers and food lovers.
+PROCEDURE
+1. Open a newsletter website or a digital magazine page.
+2. Select a weekly or quarterly newsletter and subscribe if available.
+3. Read the newsletter and identify its main content categories.
+4. Observe its headings, images, links, contact details and page structure.
+5. Identify likely customer segments for each category.
+6. Describe how the newsletter improves engagement and brand recognition.
+7. Record the analysis and prepare the lab report.
+
+Observation: Organized sections, appealing pictures and useful recommendations make the newsletter relevant
+to different audiences.
+RESULT
+Thus, the content and structure of a travel newsletter were analyzed to understand how newsletters
+build brand awareness and attract potential customers.
+
+VIVA QUESTIONS AND ANSWERS
+1. What is a newsletter? A newsletter is an email or publication that shares information and updates with
+subscribers.
+2. What is brand awareness? It means how easily people recognize and remember a company.
+3. What is customer segmentation? It means dividing customers into groups based on their needs or interests.
+4. What is email marketing? It is promoting products or services and maintaining customer relationships through
+emails.
+
+EXPERIMENT 02
+Social Media Political Advertising: Impacts and Ethics
+Lab manual reference: manual analysis format: pages 11-13 (Dove shampoo example adapted to political advertising)
+AIM
+To discuss the positive and negative impacts and ethical implications of using popular social media
+applications for political advertising.
+PROBLEM DESCRIPTION
+Platforms such as Facebook, Instagram, YouTube and X can share political messages, election information
+and public issue campaigns. Political advertising may increase public awareness, but misleading
+information, manipulation and privacy risks can also arise.
+DIGITAL MARKETING STRATEGY
+1. Positive impacts
+• Wide audience reach: Political information can reach many people quickly.
+• Public awareness: Citizens can learn about elections, policies and public issues.
+• Cost-effective communication: Online messages may cost less than traditional media.
+• Public engagement: People can comment, share and discuss issues.
+• Fast communication: Announcements can be communicated immediately.
+2. Negative impacts
+• Fake news: False claims can spread quickly.
+• Misinformation: Edited videos or misleading posts can confuse people.
+• Data privacy issues: Personal data may be misused or handled without permission.
+• Social conflict: Harmful posts can increase division and hostility.
+• Manipulation: Misleading advertisements can distort public understanding.
+3. Ethical implications
+• Transparency: Clearly identify the advertiser and sponsor.
+• Honesty: Avoid false information and misleading claims.
+• Privacy: Respect consent and protect personal information.
+• Fairness: Do not promote hatred or discrimination.
+• Accountability: Follow applicable election rules and platform policies.
+PROCEDURE
+1. Select popular social media platforms used for public information.
+2. Observe publicly available political advertisements or awareness campaigns.
+3. Identify the intended message and target audience.
+4. List benefits such as reach and public participation.
+5. Identify drawbacks such as fake news, manipulation and privacy risks.
+6. Evaluate transparency, accuracy, fairness and accountability.
+7. Compare the findings and prepare the report.
+
+Observation: Social media supports broad political communication but requires truthfulness, transparency and
+responsible data practices.
+RESULT
+Thus, the positive impacts, negative impacts and ethical implications of political advertising on social
+media were studied and analyzed.
+
+VIVA QUESTIONS AND ANSWERS
+1. What is political advertising? It is the promotion of political messages, policies, candidates or campaigns using
+media.
+2. Name two social media platforms. Instagram and Facebook.
+3. What is misinformation? It is false or incorrect information shared with others.
+4. What is ethical advertising? It means communicating honestly, fairly and responsibly.
+
+EXPERIMENT 03
+Case Study: Insurance Lead Generation and Conversion
+AIM
+To study how an insurance company generates, manages and converts potential leads into customers
+using digital marketing strategies.
+PROBLEM DESCRIPTION
+Insurance companies need interested customers for their services. A lead is a person who shows interest
+in a product or service. The challenge is to identify suitable leads, manage enquiries, build trust and
+convert interested people into policyholders.
+DIGITAL MARKETING STRATEGY
+Case study: Life insurance company. The manual discusses company-provided leads, third-party lead
+providers, LinkedIn and professional networking.
+1. Lead generation
+• Company leads: Potential customer contacts supplied by the company.
+• Third-party leads: Contacts obtained through authorized lead providers.
+• LinkedIn marketing: Share expertise and connect with professionals.
+• Social media content: Publish useful information about policy benefits.
+• Referrals: Ask satisfied customers for voluntary recommendations.
+2. Lead management
+• Collect details with permission and record customer requirements.
+• Classify leads by interest and needs; store information in CRM software.
+• Follow up respectfully and explain appropriate policy options.
+3. Lead conversion and customer relationships
+• Understand customer needs and answer questions.
+• Provide suitable plans and help with the policy application process.
+• Support customers after purchase and maintain meaningful contact.
+PROCEDURE
+1. Select a life insurance company as a case study.
+2. Identify its online and offline lead generation sources.
+3. Study the role of LinkedIn, referrals and professional networking.
+4. Observe the methods used to record and prioritize customer enquiries.
+5. Explain follow-up, policy discussions and conversion steps.
+6. Identify how CRM improves customer relationships.
+7. Prepare the case study analysis.
+
+SAMPLE OUTPUT
+
+Example Activity
+1. Lead generation
+2. Lead management
+Website enquiry, LinkedIn or referral
+Record contact and identify insurance requirement
+3. Follow-up
+Explain policy details and answer questions
+4. Conversion
+Complete application and policy purchase
+5. Retention
+Provide support and maintain the relationship
+
+RESULT
+Thus, the process of generating, managing and converting leads into customers in a life insurance
+company was studied successfully.
+
+VIVA QUESTIONS AND ANSWERS
+1. What is a lead? A potential customer who shows interest in a product or service.
+2. What is lead generation? The process of attracting and identifying potential customers.
+3. What is lead conversion? Turning an interested lead into a paying customer.
+4. What is CRM? Customer Relationship Management, a method or system for managing customer data and
+interactions.
+
+EXPERIMENT 04
+Keyword Research for a Skincare or Dermatology Clinic
+AIM
+To perform keyword research for a skincare hospital or dermatology clinic website using Google
+Keyword Planner and analyze keywords based on search volume, competition and relevance.
+PROBLEM DESCRIPTION
+A dermatology clinic wants patients to find its website when searching for skin care services. Good
+keyword research helps the clinic understand patient searches, improve content and plan online
+advertisements.
+DIGITAL MARKETING STRATEGY
+Tool: Google Keyword Planner in Google Ads.
+• Keyword research: Find phrases such as "dermatology clinic", "acne treatment" and "skin specialist near
+me".
+• Search volume: Check average monthly searches for each keyword.
+• Competition: Compare low, medium and high advertiser competition.
+• Relevance: Prefer keywords that match the clinic's actual services.
+• Long-tail keywords: Consider specific phrases like "best dermatologist for acne treatment in Nagercoil".
+• Implementation: Use suitable keywords in service descriptions, website headings and ad campaigns.
+Important: Google Keyword Planner competition is for advertisements. It is not a direct measurement of organic SEO
+keyword difficulty.
+PROCEDURE
+1. Visit ads.google.com and sign in to Google Ads.
+2. Open Tools / Planning / Keyword Planner (menu position may differ).
+3. Choose "Discover new keywords".
+4. Enter "skin treatment", "dermatology clinic" and similar terms.
+5. Set the desired location and language.
+6. Click "Get results" and inspect keyword ideas.
+7. Review average monthly searches and advertiser competition.
+8. Apply filters, select relevant keywords and record the results.
+9. Use the selected keywords in website content and marketing campaigns.
+
+RESULT
+Thus, the process of keyword research for a skincare website using Google Keyword Planner was studied
+to identify relevant keywords based on search volume and competition.
+
+VIVA QUESTIONS AND ANSWERS
+1. What is a keyword? A word or phrase entered by a user into a search engine.
+2. What is Google Keyword Planner? A Google Ads tool for finding keywords and viewing estimated search
+demand and ad competition.
+3. What is search volume? How often people search for a keyword during a period.
+4. What is SEO? Search Engine Optimization, which helps a website appear in relevant unpaid search results.
+
+EXPERIMENT 05
+Google Search Indexing and URL Submission
+AIM
+To demonstrate how Google Search Console can be used to submit website URLs for indexing and
+explain how Google discovers web pages.
+PROBLEM DESCRIPTION
+New websites and blog posts may not appear immediately in Google Search. Google must first discover
+and crawl a page before deciding whether to add it to its search index. Google Search Console lets site
+owners inspect URLs and request indexing when eligible.
+DIGITAL MARKETING STRATEGY
+Tools: Blogger, Google Search Console; the manual also includes a Google Cloud / Indexing API
+workflow.
+• Website creation: Publish a helpful blog post.
+• Discovery: Google finds pages through links, sitemaps and other methods.
+• Crawling: Googlebot requests and reads the page.
+• Indexing: Google decides whether to store the page in its search index.
+• Inspection: Use Search Console to check if a URL is indexed.
+• Visibility: An indexed page may appear for relevant searches; indexing does not guarantee ranking.
+PROCEDURE
+1. Open blogger.com and sign in with a Google account.
+2. Create a blog and choose its title and URL.
+3. Create a new post with a title and useful content.
+4. Publish the post and copy its full URL.
+5. Open search.google.com/search-console.
+6. Add the website property and complete ownership verification.
+7. Paste the published post URL into "URL Inspection".
+8. View the current status of the URL.
+9. If the page is eligible and not indexed, select "Request Indexing".
+10. Check the status again later and record the result.
+SAMPLE OUTPUT
+URL Inspection Status
+Meaning / Next Action
+URL is not on Google
+The page is not indexed; use Request Indexing if eligible.
+Indexing requested
+Google received the request; indexing is not guaranteed.
+Exam-ready notes  •  Based on the provided lab manual
+Page 10
+DIGITAL MARKETING  |  SIX LAB EXPERIMENTS
+URL Inspection Status
+Meaning / Next Action
+URL is on Google
+The page is included in Google's index.
+Example URL: https://example.blogspot.com/my-post
+Technical note: The manual demonstrates the Google Web Search Indexing API using Google Cloud and a service account.
+That API is intended only for supported JobPosting and livestream BroadcastEvent pages, not ordinary Blogger posts. For a
+normal blog page, use the Search Console URL Inspection method above.
+
+RESULT
+Thus, website URL submission and the process of discovering, crawling and indexing pages through
+Google Search Console were studied.
+
+VIVA QUESTIONS AND ANSWERS
+1. What is indexing? Indexing is the process of storing and organizing information about a web page in a search
+index.
+2. What is crawling? It is the process where search engine bots discover and read web pages.
+3. What is Google Search Console? A free tool for website owners to monitor search performance and indexing
+status.
+4. What is a sitemap? A file that lists important URLs to help search engines discover pages.
+
+EXPERIMENT 06
+Predictive Analytics in Marketing Automation Using
+Excel
+Lab manual reference: pages 42-48
+AIM
+To discuss how predictive analytics influences marketing automation by predicting customer behavior,
+personalizing campaigns and improving conversion rates using Microsoft Excel.
+PROBLEM DESCRIPTION
+Companies collect data about website visits, email interactions and purchases. Predictive analytics uses
+historical data and statistical or machine learning methods to estimate future customer behavior. Data
+analysis can help marketers focus on relevant leads and improve their campaigns.
+DIGITAL MARKETING STRATEGY
+Tool: Microsoft Excel (or spreadsheet software).
+• Customer behavior analysis: Study earlier visits, clicks and purchases.
+• Customer segmentation: Divide customers into high-, medium- and low-interest groups.
+• Personalization: Send messages or offers related to customer interests.
+• Marketing automation: Automate welcome emails, recommendations and follow-ups.
+• Conversion optimization: Concentrate on interested leads and measure campaign results.
+Useful Excel functions
+Formula
+Purpose
+=SUM(B2:B10)
+=AVERAGE(B2:B10)
+Total of numeric values
+Average of numeric values
+=MAX(B2:B10)
+Highest value
+=MIN(B2:B10)
+Lowest value
+=COUNT(B2:B10)
+=IF(B2>10,"High","Low")
+Number of numeric cells
+Classifies a value based on a condition
+PROCEDURE
+1. Open Microsoft Excel and create a worksheet.
+2. Enter customer names, website visits, email clicks and earlier purchases.
+3. Use a formula to calculate an illustrative engagement score.
+4. Classify customers into interest groups using IF.
+5. Create a pivot table to summarize the groups.
+Exam-ready notes  •  Based on the provided lab manual
+Page 12
+DIGITAL MARKETING  |  SIX LAB EXPERIMENTS
+6. Draw a chart to compare customer engagement.
+7. Recommend different marketing actions for the groups.
+8. Explain how a genuine predictive model would learn from historical outcomes.
+SAMPLE OUTPUT
+Customer
+Visits
+Clicks
+Purchases
+Arun
+5
+3
+Score
+1
+Interest
+24
+Priya
+3
+2
+High
+0
+Rahul
+1
+Score formula (E2): =B2*2+C2*3+D2*5
+0
+0
+Interest classification (F2): =IF(E2>=20,"High",IF(E2>=10,"Medium","Low"))
+12
+2
+Medium
+Low
+Sample marketing action: Arun - personal follow-up; Priya - product education; Rahul - occasional introductory
+content.
+Interpretation: This numerical example is a simple rule-based engagement score, not a trained predictive model. True
+predictive analytics estimates future outcomes using models fitted to historical data.
+
+RESULT
+Thus, the role of predictive analytics in marketing automation was studied through Excel-based customer
+data analysis, scoring and visualization.
+
+VIVA QUESTIONS AND ANSWERS
+1. What is predictive analytics? It uses past data and models to estimate future outcomes.
+2. What is marketing automation? Software-supported automation of repetitive marketing activities.
+3. What is conversion rate? The percentage of visitors or leads who complete a desired action.
+4. What is a pivot table? An Excel tool used to summarize and analyze data
